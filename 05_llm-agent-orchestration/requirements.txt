@@ -1,0 +1,96 @@
+﻿# 05_llm-agent-orchestration 전체 공통 설치 파일
+#
+# 기본 수업 흐름은 각 단원 폴더 안에서 .venv를 따로 만들고,
+# 그 단원에 필요한 패키지만 설치하는 방식입니다.
+#
+# 이 파일은 전체 과정을 하나의 가상환경에서 빠르게 복습하거나,
+# 99_final-agent-project까지 한 번에 실행해 보고 싶을 때 사용합니다.
+#
+# 사용 예시:
+#   cd C:\aidev\05_llm-agent-orchestration
+#   python -m venv .venv
+#   .\.venv\Scripts\Activate.ps1
+#   python -m pip install --upgrade pip
+#   pip install -r requirements.txt
+
+# OpenAI API 호출에 사용합니다.
+# 사용 위치:
+# - 01_llm-api-and-local-llm
+# - 02_prompt-and-response-quality
+# - 04_function-calling-and-tool-use
+# - 05_rag-memory-and-vector-search
+# - 06_langgraph-state-flow
+openai
+
+# .env 파일에서 OPENAI_API_KEY, OPENAI_MODEL, OLLAMA_BASE_URL 같은 값을 읽을 때 사용합니다.
+# API Key를 코드에 직접 쓰지 않기 위한 필수 보조 패키지입니다.
+# 사용 위치: 대부분의 OpenAI/Ollama/LangSmith 예제
+python-dotenv
+
+# HTTP API를 호출할 때 사용합니다.
+# Ollama REST API 호출, 외부 API Tool 예제, 간단한 API 래퍼 실습에서 사용합니다.
+# 사용 위치:
+# - 01_llm-api-and-local-llm
+# - 04_function-calling-and-tool-use
+httpx
+
+# 데이터 구조를 명확하게 정의하고 검증할 때 사용합니다.
+# Structured Output, Tool 입력값, Agent 상태 모델을 설명할 때 중요합니다.
+# 사용 위치:
+# - 02_prompt-and-response-quality
+# - 04_function-calling-and-tool-use
+# - 06_langgraph-state-flow
+pydantic
+
+# LangChain의 기본 프레임워크 패키지입니다.
+# 모든 예제를 LangChain으로 작성하기 위해서가 아니라,
+# PromptTemplate, Runnable, Chain 같은 구조화 도구를 이해하기 위해 사용합니다.
+# 사용 위치: 03_langchain-minimal
+langchain
+
+# LangChain에서 OpenAI 모델을 연결할 때 사용합니다.
+# ChatOpenAI 같은 클래스를 통해 gpt-4.1-mini 모델을 호출하는 예제에서 사용합니다.
+# 사용 위치:
+# - 03_langchain-minimal
+# - 06_langgraph-state-flow
+langchain-openai
+
+# LangChain/LangGraph 내부에서 공통으로 쓰이는 핵심 타입과 Runnable 구조를 제공합니다.
+# 사용 위치:
+# - 03_langchain-minimal
+# - 06_langgraph-state-flow
+langchain-core
+
+# 긴 문서를 작은 조각(chunk)으로 나누는 실습에 사용합니다.
+# RAG에서는 문서를 너무 크게 넣지 않고 검색 가능한 단위로 나누는 과정이 중요합니다.
+# 사용 위치:
+# - 03_langchain-minimal
+# - 05_rag-memory-and-vector-search
+langchain-text-splitters
+
+# Agent 실행 흐름을 Node, Edge, State 기반 그래프로 구성할 때 사용합니다.
+# 조건 분기, 재시도, Tool 호출, RAG 노드 연결 같은 상태 흐름을 실습합니다.
+# 사용 위치: 06_langgraph-state-flow
+langgraph
+
+# PostgreSQL/pgvector 컨테이너에 Python으로 접속할 때 사용합니다.
+# [binary] 옵션은 Windows에서도 별도 빌드 과정 없이 설치하기 쉽게 도와줍니다.
+# 사용 위치: 05_rag-memory-and-vector-search
+psycopg[binary]
+
+# Redis 컨테이너에 Python으로 접속할 때 사용합니다.
+# 세션 메모리, 캐시, 최근 대화 저장 예제에서 사용합니다.
+# 사용 위치:
+# - 05_rag-memory-and-vector-search
+# - 06_langgraph-state-flow
+redis
+
+# MCP 선택 심화 실습에서 사용합니다.
+# 04_function-calling-and-tool-use/05_mcp-concept-and-optional-practice에서
+# 간단한 MCP 서버와 클라이언트를 실행할 때만 필요합니다.
+mcp
+
+# 99_final-agent-project에서 간단한 Agent UI를 만들 때 사용합니다.
+# 03_supabase-ai-frontend에서 배운 Streamlit 흐름을 05의 Agent 프로젝트에 연결합니다.
+# 사용 위치: 99_final-agent-project
+streamlit

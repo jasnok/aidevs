@@ -1,0 +1,14 @@
+# backend API 서버를 만들 때 사용합니다.
+fastapi
+
+# FastAPI 앱을 실행하는 ASGI 서버입니다.
+uvicorn
+
+# frontend와 monitor 화면을 만들 때 사용합니다.
+streamlit
+
+# frontend/worker/monitor가 backend API를 호출할 때 사용합니다.
+httpx
+
+# .env 파일의 환경 변수를 읽습니다.
+python-dotenv

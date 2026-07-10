@@ -1,0 +1,14 @@
+{
+  "python.terminal.activateEnvironment": true,
+  "terminal.integrated.profiles.windows": {
+    "PowerShell (venv)": {
+      "source": "PowerShell",
+      "args": [
+        "-NoExit",
+        "-Command",
+        "$dir = (Get-Location).Path; while ($dir) { $activate = Join-Path $dir '.venv\\Scripts\\Activate.ps1'; if (Test-Path $activate) { & $activate; break }; $parent = Split-Path $dir -Parent; if ($parent -eq $dir) { break }; $dir = $parent }"
+      ]
+    }
+  },
+  "terminal.integrated.defaultProfile.windows": "PowerShell (venv)"
+}

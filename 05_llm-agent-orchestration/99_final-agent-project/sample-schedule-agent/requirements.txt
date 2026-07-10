@@ -1,0 +1,17 @@
+# OpenAI API 호출에 사용합니다.
+openai
+
+# .env 파일에서 API Key와 모델명을 읽을 때 사용합니다.
+python-dotenv
+
+# Agent의 State, Node, Edge 흐름을 구성할 때 사용합니다.
+langgraph
+
+# LangGraph와 OpenAI 모델을 연결하는 예제에서 사용합니다.
+langchain-openai
+
+# 샘플 Agent 화면을 만들 때 사용합니다.
+streamlit
+
+# Agent 상태와 Tool 입력/출력 데이터 구조를 검증할 때 사용합니다.
+pydantic

@@ -1,0 +1,5 @@
+# FastAPI backend 예제를 만들 때 사용합니다.
+fastapi
+
+# Docker container 안에서 FastAPI 앱을 실행하는 ASGI 서버입니다.
+uvicorn

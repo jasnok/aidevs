@@ -1,0 +1,47 @@
+﻿name: docker-build-check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  docker-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Check Python syntax
+        run: |
+          if [ -d "07_multi-agent-service-ops" ]; then
+            python -m compileall 07_multi-agent-service-ops
+          else
+            python -m compileall .
+          fi
+
+      - name: Validate Docker Compose config
+        run: |
+          if [ -d "07_multi-agent-service-ops" ]; then
+            cd 07_multi-agent-service-ops/02_service-deployment-and-automation/02_docker-compose-multi-service
+          else
+            cd 02_service-deployment-and-automation/02_docker-compose-multi-service
+          fi
+          cp .env.example .env
+          docker compose config
+
+      - name: Build compose sample image
+        run: |
+          if [ -d "07_multi-agent-service-ops" ]; then
+            cd 07_multi-agent-service-ops/02_service-deployment-and-automation/02_docker-compose-multi-service
+          else
+            cd 02_service-deployment-and-automation/02_docker-compose-multi-service
+          fi
+          docker build -t compose-sample .

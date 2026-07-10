@@ -1,0 +1,39 @@
+# 07_multi-agent-service-ops 공통 설치 파일입니다.
+#
+# 사용 예시:
+#   cd C:\aidev\07_multi-agent-service-ops
+#   python -m venv .venv
+#   .\.venv\Scripts\Activate.ps1
+#   python -m pip install --upgrade pip
+#   pip install -r requirements.txt
+
+# OpenAI API 호출과 Agent 응답 생성에 사용합니다.
+openai
+
+# .env 파일에서 API Key, AWS 리전, endpoint 설정을 읽을 때 사용합니다.
+python-dotenv
+
+# Multi-Agent 상태 흐름과 실행 그래프를 구성할 때 사용합니다.
+langgraph
+
+# Agent/Tool 연결 구조를 선택적으로 확장할 때 사용합니다.
+langchain
+langchain-openai
+langchain-core
+
+# 요청/응답, Agent 상태, 운영 이벤트 모델을 검증할 때 사용합니다.
+pydantic
+
+# backend API 서비스를 만들 때 사용합니다.
+fastapi
+uvicorn[standard]
+
+# backend/frontend/worker/monitor 사이의 HTTP 호출에 사용합니다.
+httpx
+requests
+
+# 운영 대시보드와 샘플 frontend를 만들 때 사용합니다.
+streamlit
+
+# 간단한 테스트와 CI 검증에 사용합니다.
+pytest
