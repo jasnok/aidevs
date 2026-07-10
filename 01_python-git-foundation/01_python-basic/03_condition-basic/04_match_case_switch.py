@@ -7,11 +7,16 @@ Python 3.10부터 `match-case` 문법을 사용할 수 있습니다.
 메뉴 번호, 명령어, 상태값처럼 정해진 선택지가 있을 때 자주 사용합니다.
 """
 
+import sys
+
 # 사용자가 선택한 메뉴 번호라고 가정합니다.
 # 실제 프로그램에서는 input()으로 입력받을 수도 있습니다.
-menu = "2"
+menu = input(" 숫자 입력(1~3)")
 
 print("선택한 메뉴:", menu)
+
+if(menu != "1" and menu != "2" and menu != "3"):
+    sys.exit()
 
 # match 뒤에는 비교할 기준 값을 씁니다.
 match menu:

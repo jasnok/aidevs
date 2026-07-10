@@ -10,5 +10,42 @@
       ]
     }
   },
-  "terminal.integrated.defaultProfile.windows": "PowerShell (venv)"
+  "terminal.integrated.defaultProfile.windows": "PowerShell (venv)",
+  "python-envs.pythonProjects": [
+    {
+      "path": "02_supabase-ai-backend",
+      "envManager": "ms-python.python:venv",
+      "packageManager": "ms-python.python:pip"
+    },
+    {
+      "path": "03_supabase-ai-frontend",
+      "envManager": "ms-python.python:venv",
+      "packageManager": "ms-python.python:pip"
+    },
+    {
+      "path": "04_supabase-ai-mini-project",
+      "envManager": "ms-python.python:venv",
+      "packageManager": "ms-python.python:pip"
+    },
+    {
+      "path": "05_llm-agent-orchestration",
+      "envManager": "ms-python.python:venv",
+      "packageManager": "ms-python.python:pip"
+    },
+    {
+      "path": "06_llm-agent-mini-project",
+      "envManager": "ms-python.python:venv",
+      "packageManager": "ms-python.python:pip"
+    },
+    {
+      "path": "07_multi-agent-service-ops",
+      "envManager": "ms-python.python:venv",
+      "packageManager": "ms-python.python:pip"
+    },
+    {
+      "path": "08_multi-agent-service-mini-project",
+      "envManager": "ms-python.python:venv",
+      "packageManager": "ms-python.python:pip"
+    }
+  ]
 }

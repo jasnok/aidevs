@@ -6,6 +6,8 @@
 
 # 여러 학생 이름을 리스트에 저장합니다.
 students = ["지민", "서연", "민준"]
+print(type(students))
+print(len(students))
 
 # for student in students는 students 리스트에서 값을 하나씩 꺼내
 # student 변수에 넣고, 들여쓰기 된 코드를 반복 실행합니다.

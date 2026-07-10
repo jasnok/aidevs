@@ -23,3 +23,26 @@ print("이름:", name)
 print("나이:", age)
 print("키:", height)
 print("학생인가요?", is_student)
+print(f"타입 힌트 예시 : {name}, {age}, {height}, {is_student}")
+
+msg = "         1000            "
+num = int(msg)
+print(f"입력 {num} 입니다.")
+print(f"입력 {msg} 입니다.")
+print(f"입력 {msg.strip()} 입니다.")
+
+msg2: str = "12,000,000"
+num2 = int(msg2.replace(",", ""))
+print(f"입력 {num2} 입니다.")
+
+# jmlee@tonesol.com 에서
+# id 변수에 jmlee 입력
+# domain 변수에 tonesol 입력
+# id와 domain을 출력하시오
+# "ID는 id이고, 도메인은 domain입니다."
+
+data: str = "jmlee@tonesol.com"
+id: str = data[:data.index("@")] 
+domain: str = data[data.index("@")+1:data.index(".")]
+
+print(f"ID는 {id}이고, 도메인은 {domain}입니다.")

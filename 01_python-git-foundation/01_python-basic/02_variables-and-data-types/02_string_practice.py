@@ -6,9 +6,13 @@ Python에서는 문자열의 특정 위치를 가져오거나, 일부만 잘라�
 """
 
 # message 변수에 문자열을 저장합니다.
-message = "Python Basic"
+message = "파이썬"
+message: str = "Python Basic"
 
 print("전체 문자열:", message)
+print("문자열 길이:", len(message))
+print(f"안녕하세요\t{message}\n입니다.")  # f-string을 사용한 출력 예시
+print("첫 글자 : ", message[-12])
 
 # 문자열의 위치 번호는 0부터 시작합니다.
 # message[0]은 첫 번째 글자인 "P"를 의미합니다.
@@ -16,7 +20,7 @@ print("첫 글자:", message[0])
 
 # message[:6]은 처음부터 6번째 위치 전까지 잘라냅니다.
 # "Python Basic"에서 앞 6글자는 "Python"입니다.
-print("앞 6글자:", message[:6])
+print("앞 6글자:", message[3:5])
 
 # 음수 인덱스는 뒤에서부터 위치를 셉니다.
 # message[-5:]는 뒤에서 5글자를 가져옵니다.

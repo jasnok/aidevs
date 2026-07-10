@@ -10,7 +10,10 @@
 # 오른쪽 값을 왼쪽 변수 이름에 저장한다고 이해하면 됩니다.
 user_name = "Jean"
 user_age = 30
+user_height = 175.5
 is_beginner = True
+user_height = "175.5cm"
+print("키:", user_height)
 
 # 변수 이름 뒤에 : str, : int, : bool처럼 적는 것을 타입 힌트라고 합니다.
 # name: str = "kim"은 "name 변수는 문자열로 사용할 예정"이라는 뜻입니다.
@@ -18,6 +21,13 @@ is_beginner = True
 name: str = "kim"
 age: int = 20
 is_student: bool = True
+user_height: float = 175.5
+#user_weight: double = 70.5
+name = 100
+
+print(type(name), type(age), type(is_student), 
+      type(user_name), type(user_age), 
+      type(user_height), type(is_beginner))
 
 # 문자열, 숫자, True/False 값을 각각 출력합니다.
 print("이름:", user_name, "입니다.")
@@ -36,5 +46,12 @@ print(type(is_beginner))
 price_text = "1000"
 
 # int()는 숫자 모양의 문자열을 정수로 변환합니다.
-price = int(price_text)
+price = float(price_text)
 print("가격 + 500 =", price + 500)
+
+num1 = 10
+num2 = 3
+num3 = 100
+
+result = num3 + num1 / num2
+print("결과:", result)
