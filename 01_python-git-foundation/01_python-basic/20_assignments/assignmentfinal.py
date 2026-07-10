@@ -23,6 +23,5 @@ while True:
 
         if number > 0:
             print(f"입력한 자연수는 {number}입니다.")
-            break
 
     print("1 이상의 자연수를 다시 입력해주세요.")
