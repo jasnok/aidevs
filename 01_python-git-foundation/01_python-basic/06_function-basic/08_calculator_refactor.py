@@ -9,24 +9,23 @@
 3. 나중에 기능을 추가하기 쉽습니다.
 """
 
-
-def calculate(a, b, operator):
+def calculate(a: int, b: int, operator: str) -> float | None:
     if operator == "+":
         return a + b
-
     if operator == "-":
         return a - b
-
     if operator == "*":
         return a * b
-
     if operator == "/":
         if b == 0:
-            return "0으로 나눌 수 없습니다."
+            print("0으로 나눌 수 없습니다.")
+            return None
         return a / b
-
-    return "지원하지 않는 연산자입니다."
-
+    if operator == "%":
+        return a % b
+    else:
+        print("해당하는 연산자가 없습니다.")
+        return None
 
 print("계산 함수 테스트")
 
@@ -36,5 +35,6 @@ print("10 * 5 =", calculate(10, 5, "*"))
 print("10 / 5 =", calculate(10, 5, "/"))
 print("10 / 0 =", calculate(10, 0, "/"))
 print("10 % 5 =", calculate(10, 5, "%"))
+print("10 @ 5 =", calculate(10, 5, "@"))
 
 print("\n함수로 분리하면 입력을 받지 않아도 계산 기능만 확인할 수 있습니다.")

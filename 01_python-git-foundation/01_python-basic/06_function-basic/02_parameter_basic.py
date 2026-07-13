@@ -12,7 +12,7 @@ def greet(name):
     print(name, "님, 안녕하세요.")
 
 
-def print_score(name, score):
+def print_score(name: str, score: float):
     print(name, "님의 점수는", score, "점입니다.")
 
 

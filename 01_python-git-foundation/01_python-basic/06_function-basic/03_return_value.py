@@ -7,12 +7,23 @@ return은 값을 다음 계산이나 다른 함수에서 다시 사용할 수 �
 """
 
 
-def add(a, b):
+def add(a: float, b: float)-> float:
     result = a + b
     return result
 
+def divide(a: float, b: float) -> float:
+    if b == 0:
+        return None  # 0으로 나누는 경우 None을 반환하도록 처리
+    result = a / b
+    return result
 
-def make_greeting(name):
+divide_result = divide(10, 2)
+print("나누기 결과:", divide_result)
+
+divide_result_zero = divide(10, 0)
+print("나누기 결과:", divide_result_zero)
+
+def make_greeting(name: str ) -> str:
     message = f"{name}님, 안녕하세요."
     return message
 
@@ -31,8 +42,12 @@ print(greeting)
 def check_number(number):
     if number < 0:
         return "음수입니다."
+    if number == 0:
+        return "0입니다."
+    if  number > 0:
+        return "양수입니다."
 
-    return "0 또는 양수입니다."
+    return None  # 모든 조건에 해당하지 않는 경우 None을 반환
 
 
 print(check_number(-3))

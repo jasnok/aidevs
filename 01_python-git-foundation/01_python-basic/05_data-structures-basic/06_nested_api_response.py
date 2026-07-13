@@ -33,6 +33,12 @@ print("데이터 개수:", api_response["count"])
 
 messages = api_response["data"]
 
+# tags가 몇 개인지를 출력하시오.
+for message in messages:
+    message_id = message["id"]
+    tags = message["tags"]
+    print(f"메시지 ID {message_id}의 태그 개수:", len(tags))
+
 print("\n[메시지 목록]")
 
 for message in messages:

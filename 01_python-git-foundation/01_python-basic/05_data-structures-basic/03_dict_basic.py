@@ -47,4 +47,4 @@ for key, value in student.items():
 print("\nkey 목록:", list(student.keys()))
 
 # values()는 value만 꺼냅니다.
-print("value 목록:", list(student.values()))
+print("value 목록:", tuple(student.values()))

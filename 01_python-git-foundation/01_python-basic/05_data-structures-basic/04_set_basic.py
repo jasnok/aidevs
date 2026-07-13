@@ -12,7 +12,7 @@ set을 사용할 수 있습니다.
 """
 
 # 중괄호 { }를 사용해 set을 만들 수 있습니다.
-tags = {"python", "fastapi", "python", "supabase"}
+tags = {"python", "fastapi", "python", "supabase", "python"}
 
 print("태그 목록:", tags)
 print("자료형:", type(tags))
