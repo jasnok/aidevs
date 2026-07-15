@@ -82,7 +82,8 @@ README.md	프로젝트 설명 문서
 [GitHub](https://github.com)
 같은 프로젝트 안의 파일로 연결할 수도 있습니다.
 
-[테스트 파일](./test_main.py)
+[테스트 파일](../00_references/README.md)
+
 1. 이미지 넣기
 이미지는 보통 docs/images 폴더에 넣습니다.
 
@@ -95,13 +96,15 @@ project
       └─ test-result.png
 README에서 이미지를 넣는 방법:
 
-![테스트 실행 결과](./docs/images/test-result.png)
+![테스트 실행 결과](./images/aaa.jpg)
 주의:
+
 
 이미지 파일 이름이 정확해야 합니다.
 경로는 README.md 위치를 기준으로 씁니다.
 파일 이름에 공백을 넣지 않는 것이 좋습니다.
-8. Mermaid 도표 넣기
+
+1. Mermaid 도표 넣기
 GitHub README에서는 Mermaid 도표를 사용할 수 있습니다.
 
 ```mermaid

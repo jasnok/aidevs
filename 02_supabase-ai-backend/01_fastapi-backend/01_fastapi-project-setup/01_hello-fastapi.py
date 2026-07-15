@@ -50,4 +50,4 @@ def read_root():
 def health_check():
     """서버가 살아 있는지 확인하는 가장 기본적인 점검용 API입니다."""
 
-    return {"status": "ok"}
+    return {"status": "okbary"}

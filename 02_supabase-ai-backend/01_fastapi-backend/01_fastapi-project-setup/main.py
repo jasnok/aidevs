@@ -33,3 +33,21 @@ def health_check() -> dict[str, str]:
     """서버가 살아 있는지 확인하는 가장 기본적인 점검용 API입니다."""
 
     return {"status": "ok"}
+
+@app.get("/login")
+def health_check():
+    """서버가 살아 있는지 확인하는 가장 기본적인 점검용 API입니다."""
+
+    return {"status": "login ok"}
+
+@app.get("/logout")
+def health_check():
+    """서버가 살아 있는지 확인하는 가장 기본적인 점검용 API입니다."""
+
+    return {"status": "logout ok"}
+
+@app.get("/search")
+def health_check() -> dict[str, str]:
+    """서버가 살아 있는지 확인하는 가장 기본적인 점검용 API입니다."""
+    num = 10 / 0 
+    return {"status": "search ok"}
