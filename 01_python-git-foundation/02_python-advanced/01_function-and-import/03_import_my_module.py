@@ -11,14 +11,14 @@ r"""직접 만든 모듈을 import하는 예제입니다.
     뒤 과정의 FastAPI 프로젝트도 여러 파일을 import해서 동작합니다.
 """
 
-from my_tools import create_answer, normalize_text
+from my_tools import normalize_text as ca, create_answer as nt
 
 
 def main() -> None:
     question = "  import는 왜 필요한가요?  "
 
-    cleaned_question = normalize_text(question)
-    answer = create_answer(cleaned_question)
+    cleaned_question = ca(question)
+    answer = nt(cleaned_question)
 
     print("정리된 질문:", cleaned_question)
     print("답변:", answer)
