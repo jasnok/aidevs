@@ -38,6 +38,7 @@ class MemoUpdate(BaseModel):
     """PUT 요청에서 받을 수정 데이터 형식입니다."""
 
     # 수정 요청에서도 제목과 본문이 비어 있지 않도록 같은 검증 조건을 둡니다.
+    id: int = Field(min = 1)
     title: str = Field(min_length=1, examples=["수정된 제목"])
     content: str = Field(min_length=1, examples=["수정된 내용입니다."])
 
@@ -55,7 +56,7 @@ next_memo_id = 2
 
 # @app.get은 GET 요청을 처리하는 API 주소를 만듭니다.
 # GET은 서버에 있는 데이터를 조회할 때 사용합니다.
-@app.get("/memos")
+@app.get("/memos/list")
 def list_memos():
     """전체 메모 목록을 조회합니다."""
 
@@ -67,10 +68,9 @@ def list_memos():
 # @app.post는 POST 요청을 처리합니다.
 # POST는 새 데이터를 만들 때 사용합니다.
 # status_code=201은 "새 리소스를 만들었다"는 의미의 HTTP 상태 코드입니다.
-@app.post("/memos", status_code=201)
+@app.post("/memos/create", status_code=201)
 def create_memo(memo: MemoCreate):
     """새 메모를 생성합니다."""
-
     # 함수 안에서 바깥쪽 next_memo_id 값을 수정하려면 global이 필요합니다.
     global next_memo_id
 
@@ -86,23 +86,23 @@ def create_memo(memo: MemoCreate):
     # 다음 생성 요청에서 겹치지 않는 id를 쓰기 위해 1 증가시킵니다.
     next_memo_id += 1
 
-    return {"message": "memo created", "data": new_memo}
+    return {"message": "memo created", "data": memos[memo.id]}
 
 
 # @app.put은 PUT 요청을 처리합니다.
 # PUT은 기존 데이터를 새 내용으로 수정할 때 사용합니다.
 # {memo_id}는 URL 경로에서 값을 받아오는 Path Parameter입니다.
-@app.put("/memos/{memo_id}")
-def update_memo(memo_id: int, memo: MemoUpdate):
+@app.put("/memos")
+def update_memo(memo: MemoUpdate):
     """기존 메모를 수정합니다."""
 
     # 요청한 id가 저장소에 없으면 404 오류를 직접 발생시킵니다.
-    if memo_id not in memos:
+    if memo.id not in memos:
         raise HTTPException(status_code=404, detail="Memo not found")
 
     # 기존 메모를 같은 id의 새 데이터로 덮어씁니다.
-    memos[memo_id] = {
-        "id": memo_id,
+    memos[memo.id] = {
+        "id": memo.id,
         "title": memo.title,
         "content": memo.content,
     }
@@ -118,7 +118,9 @@ def delete_memo(memo_id: int):
 
     # 없는 메모를 삭제하려고 하면 404로 알려줍니다.
     if memo_id not in memos:
-        raise HTTPException(status_code=404, detail="Memo not found")
+        print(f"{memo_id}는 없습니다......")
+        return
+        # raise HTTPException(status_code=404, detail="Memo not found")
 
     # pop은 dict에서 값을 꺼내면서 동시에 삭제합니다.
     # 삭제한 데이터를 응답에 포함하면 무엇이 삭제됐는지 확인하기 쉽습니다.
