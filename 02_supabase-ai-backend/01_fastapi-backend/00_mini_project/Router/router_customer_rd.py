@@ -1,61 +1,21 @@
+
+# search 까지 포함.
+
 """
 uvicorn 00_request:app --reload
 """
 
 
-from fastapi import FastAPI, HTTPException
-from mymodels import Customer, CustomerDetail, ApiResponse
+from fastapi import APIRouter, HTTPException
+from Schema.model_common import ApiResponse
+from model_customer import CustomerDetail
 
-
-app = FastAPI(
-    title = "Request Test",
-    description = "request test",
-    version = "0.1"
-)
-
-
-@app.get("/health")
-def health():
-    response = ApiResponse(
-        success=True,
-        message="OK",
-    )
-    return response
-
-# Request Body
-# insert, update
-@app.put("/update")
-async def update(customer:Customer):
-    print(customer.id)
-    print(customer.name)
-    print(customer.age)
-    if customer.id == "id88":
-        raise HTTPException(status_code=404, detail="ID가 존재 안함")
-    await print("수정 진행...")
-    response = ApiResponse(
-        success = True,
-        message = f"{customer.name} 수정 완료!",
-        data = customer
-    )
-    return response
-
-
-@app.post("/register")
-async def register(customer:Customer):
-    print(customer.id)
-    print(customer.name)
-    print(customer.age)
-    response = None
-    response = ApiResponse(
-        success = True,
-        message = f"{customer.name} 가입축하!",
-    )
-    return response
+router_rd = APIRouter()
 
 # Path Paramter
 # 127.0.0.1:8000/get/id01
 # get , delete
-@app.delete("/delete/{input_id}")
+@router_rd.delete("/delete/{input_id}")
 async def delete(input_id : str):
     if input_id == "id99":
         raise HTTPException(status_code=404, detail="ID가 존재 안함")
@@ -68,13 +28,13 @@ async def delete(input_id : str):
     return response
 
 
-@app.get("/get/{input_id}")
+@router_rd.get("/get/{input_id}")
 async def get(input_id : str):
     if input_id != "id01":
         # return "없어요"
         raise HTTPException(status_code=404, detail="ID가 존재 안함")
     customer_data = None
-    await customer_data = {
+    customer_data = {
         "id":"id01",
         "pwd":"xsfafdsa",
         "name":"james",
@@ -94,7 +54,7 @@ async def get(input_id : str):
 
 # Query Parameter
 # 검색
-@app.get("/search")
+@router_rd.get("/search")
 async def search(
     id : str | None = None,
     name : str | None = None,
@@ -105,7 +65,7 @@ async def search(
     print(f"{age}로 검색 합니다.")
 
     customers = None
-    await customers = [
+    customers = [
         {
             "id" : "id01" ,
             "name" : "name1" ,

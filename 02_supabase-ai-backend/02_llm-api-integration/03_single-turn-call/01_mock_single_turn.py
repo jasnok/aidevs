@@ -40,6 +40,9 @@ prompt = (
 
 # 싱글턴 호출은 "현재 질문 1개 -> AI 답변 1개" 흐름입니다.
 result = mock_llm_response(prompt, temperature=0.2, max_tokens=150)
-
+print("1.=====================================")
+print(result)
+print("2.=====================================")
 print(result["answer"])
+print("3.=====================================")
 print("\n사용량 예시:", result["usage"])

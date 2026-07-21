@@ -23,11 +23,33 @@ from fastapi import FastAPI
 # uvicorn 실행 명령의 마지막 `:app`은 아래 변수 이름 `app`과 연결됩니다.
 app = FastAPI(title="Async Endpoint Practice")
 
+def get_data(request:str):
+    asyncio.sleep(5)
+    return f"{request}질문의 LLM의 응답 입니다."
+
+# async def로 만든 함수는 비동기 엔드포인트입니다.
+# 오래 걸리는 작업을 await로 기다리는 동안 서버가 다른 요청도 처리할 수 있습니다.
+@app.get("/slow-task2")
+async def slow_task2(request:str):
+    """일부러 기다리는 API입니다.
+
+    time.sleep()이 아니라 asyncio.sleep()을 사용해야 이벤트 루프를 막지 않습니다.
+    """
+
+    # await는 "이 작업이 끝날 때까지 기다리되, 서버 전체를 멈추지는 말라"는 의미입니다.
+    # seconds 값을 Query Parameter로 받을 수 있습니다. 예: /slow-task?seconds=3
+    response = get_data(request)
+
+    return {
+        "message": response,
+    }
+
+
 
 # async def로 만든 함수는 비동기 엔드포인트입니다.
 # 오래 걸리는 작업을 await로 기다리는 동안 서버가 다른 요청도 처리할 수 있습니다.
 @app.get("/slow-task")
-async def slow_task(seconds: int = 2):
+async def slow_task(seconds: int = 5):
     """일부러 기다리는 API입니다.
 
     time.sleep()이 아니라 asyncio.sleep()을 사용해야 이벤트 루프를 막지 않습니다.

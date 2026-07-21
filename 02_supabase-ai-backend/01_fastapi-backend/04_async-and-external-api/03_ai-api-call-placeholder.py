@@ -43,7 +43,7 @@ async def call_fake_ai_model(message: str, tone: str) -> str:
     # 실제 서비스라면 이 부분에서 Gemini API를 기본으로 호출합니다.
     # OpenAI API는 선택/비교 실습을 진행할 때 연결할 수 있습니다.
     # 지금은 API key 없이도 흐름을 이해할 수 있도록 1초 기다린 뒤 샘플 응답을 만듭니다.
-    await asyncio.sleep(1)
+    await asyncio.sleep(5)
     return f"[{tone}] 질문 '{message}'에 대한 샘플 AI 응답입니다."
 
 

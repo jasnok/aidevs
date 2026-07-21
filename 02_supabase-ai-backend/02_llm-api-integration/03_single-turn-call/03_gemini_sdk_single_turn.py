@@ -98,10 +98,9 @@ def main() -> None:
     client = genai.Client(api_key=api_key)
 
     prompt = (
-        "참고 메모: Pydantic은 요청 데이터를 검증하고 잘못된 요청을 422 오류로 처리한다.\n"
-        "질문: FastAPI에서 Pydantic을 왜 사용하나요? 초보자에게 설명해 주세요."
+        # "참고 메모: Pydantic은 요청 데이터를 검증하고 잘못된 요청을 422 오류로 처리한다.\n"
+        "질문: 1+1 은 뭐야?"
     )
-
     try:
         response = client.models.generate_content(
             model=model,

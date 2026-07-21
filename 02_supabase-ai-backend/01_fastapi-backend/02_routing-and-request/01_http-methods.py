@@ -38,7 +38,7 @@ class MemoUpdate(BaseModel):
     """PUT 요청에서 받을 수정 데이터 형식입니다."""
 
     # 수정 요청에서도 제목과 본문이 비어 있지 않도록 같은 검증 조건을 둡니다.
-    id: int = Field(min = 1)
+    id: int = Field(ge = 1)
     title: str = Field(min_length=1, examples=["수정된 제목"])
     content: str = Field(min_length=1, examples=["수정된 내용입니다."])
 
@@ -107,7 +107,7 @@ def update_memo(memo: MemoUpdate):
         "content": memo.content,
     }
 
-    return {"message": "memo updated", "data": memos[memo_id]}
+    return {"message": "memo updated", "data": memos[memo.id]}
 
 
 # @app.delete는 DELETE 요청을 처리합니다.
