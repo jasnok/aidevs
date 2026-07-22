@@ -126,7 +126,7 @@ def list_notes() -> dict[str, list[dict]]:
     # select("*")는 모든 컬럼을 조회한다는 뜻입니다.
     # created_at 기준 내림차순으로 정렬해서 최근 메모가 먼저 오게 합니다.
     result = (
-        supabase.table("learning_notes")
+        supabase.table("learning_notes_main")
         .select("*")
         .order("created_at", desc=True)
         .limit(20)
@@ -144,7 +144,7 @@ def get_note(note_id: str) -> dict[str, dict]:
 
     # eq("id", note_id)는 id가 note_id와 같은 행만 가져오라는 조건입니다.
     result = (
-        supabase.table("learning_notes")
+        supabase.table("learning_notes_main")
         .select("*")
         .eq("id", note_id)
         .limit(1)
@@ -165,7 +165,7 @@ def create_note(note: NoteCreate) -> dict[str, dict]:
 
     # note.model_dump()는 Pydantic 모델을 딕셔너리로 바꿉니다.
     # Supabase insert에는 딕셔너리 형태의 데이터가 필요합니다.
-    result = supabase.table("learning_notes").insert(note.model_dump()).execute()
+    result = supabase.table("learning_notes_main").insert(note.model_dump()).execute()
 
     if not result.data:
         raise HTTPException(
@@ -190,7 +190,7 @@ def update_note(note_id: str, note: NoteUpdate) -> dict[str, dict]:
     # update/delete에는 조건이 중요합니다.
     # eq("id", note_id)가 있어야 특정 메모 1개만 수정합니다.
     result = (
-        supabase.table("learning_notes")
+        supabase.table("learning_notes_main")
         .update(update_data)
         .eq("id", note_id)
         .execute()
@@ -211,7 +211,7 @@ def delete_note(note_id: str) -> dict[str, str]:
     # 삭제 전에 존재 여부를 먼저 확인합니다.
     # 이렇게 하면 없는 id를 삭제하려고 할 때도 명확하게 404를 반환할 수 있습니다.
     existing = (
-        supabase.table("learning_notes")
+        supabase.table("learning_notes_main")
         .select("id")
         .eq("id", note_id)
         .limit(1)
@@ -220,5 +220,5 @@ def delete_note(note_id: str) -> dict[str, str]:
     if not existing.data:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Note not found.")
 
-    supabase.table("learning_notes").delete().eq("id", note_id).execute()
+    supabase.table("learning_notes_main").delete().eq("id", note_id).execute()
     return {"deleted_id": note_id}

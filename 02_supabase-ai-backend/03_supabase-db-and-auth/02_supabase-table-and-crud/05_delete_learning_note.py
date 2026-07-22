@@ -14,34 +14,41 @@ def main() -> None:
 
     supabase = get_supabase()
 
-    created_result = (
-        supabase.table("learning_notes")
-        .insert(
-            {
-                "title": "Supabase delete practice",
-                "content": "삭제 실습을 위해 잠시 생성한 메모입니다.",
-            }
-        )
-        .execute()
-    )
+    # created_result = (
+    #     supabase.table("learning_notes")
+    #     .insert(
+    #         {
+    #             "title": "Supabase delete practice",
+    #             "content": "삭제 실습을 위해 잠시 생성한 메모입니다.",
+    #         }
+    #     )
+    #     .execute()
+    # )
 
-    if not created_result.data:
-        raise RuntimeError("삭제 실습용 메모를 생성하지 못했습니다.")
+    # if not created_result.data:
+    #     raise RuntimeError("삭제 실습용 메모를 생성하지 못했습니다.")
 
-    created = created_result.data[0]
-    note_id = created["id"]
-    print(f"[created for delete]\nid: {note_id}")
+    # created = created_result.data[0]
+    # note_id = created["id"]
+    # print(f"[created for delete]\nid: {note_id}")
 
     # delete도 update와 마찬가지로 조건이 중요합니다.
     # 조건이 없으면 의도하지 않은 데이터가 삭제될 수 있습니다.
-    supabase.table("learning_notes").delete().eq("id", note_id).execute()
+    result = (
+        supabase.table("learning_notes")
+        .delete()
+        .eq("id", "20260721124806404")
+        .execute()
+    )
 
-    check_result = supabase.table("learning_notes").select("*").eq("id", note_id).execute()
-    if check_result.data:
-        raise RuntimeError("삭제 후에도 데이터가 남아 있습니다. 테이블 권한을 확인하세요.")
+    print(result.data)
 
-    print("\n[deleted note]")
-    print(f"id: {note_id}")
+    # check_result = supabase.table("learning_notes").select("*").eq("id", note_id).execute()
+    # if check_result.data:
+    #     raise RuntimeError("삭제 후에도 데이터가 남아 있습니다. 테이블 권한을 확인하세요.")
+
+    # print("\n[deleted note]")
+    # print(f"id: {note_id}")
 
 
 if __name__ == "__main__":

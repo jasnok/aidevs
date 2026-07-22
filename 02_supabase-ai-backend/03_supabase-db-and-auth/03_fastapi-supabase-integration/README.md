@@ -43,11 +43,11 @@ VS Code에서 `.env`를 열고 `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`가 �
 Supabase SQL Editor에서 아래 SQL이 실행되어 있어야 합니다.
 
 ```sql
-create table if not exists learning_notes (
+create table if not exists learning_notes__main (
   id uuid primary key default gen_random_uuid(),
   title text not null,
   content text not null,
-  created_at timestamptz not null default now()
+  created_at timestamp not null default now()
 );
 ```
 

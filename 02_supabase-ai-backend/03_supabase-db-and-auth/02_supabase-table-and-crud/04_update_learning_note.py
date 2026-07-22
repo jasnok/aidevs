@@ -14,23 +14,23 @@ def main() -> None:
 
     supabase = get_supabase()
 
-    created_result = (
-        supabase.table("learning_notes")
-        .insert(
-            {
-                "title": "Supabase update practice",
-                "content": "수정 전 내용입니다.",
-            }
-        )
-        .execute()
-    )
+    # created_result = (
+    #     supabase.table("learning_notes")
+    #     .insert(
+    #         {
+    #             "title": "Supabase update practice",
+    #             "content": "수정 전 내용입니다.",
+    #         }
+    #     )
+    #     .execute()
+    # )
 
-    if not created_result.data:
-        raise RuntimeError("수정 실습용 메모를 생성하지 못했습니다.")
+    # if not created_result.data:
+    #     raise RuntimeError("수정 실습용 메모를 생성하지 못했습니다.")
 
-    created = created_result.data[0]
-    note_id = created["id"]
-    print(f"[created for update]\nid: {note_id}")
+    # created = created_result.data[0]
+    # note_id = created["id"]
+    # print(f"[created for update]\nid: {note_id}")
 
     # update에는 조건이 중요합니다.
     # eq("id", note_id)를 붙여야 방금 만든 메모 1개만 수정됩니다.
@@ -38,11 +38,11 @@ def main() -> None:
         supabase.table("learning_notes")
         .update(
             {
-                "title": "Supabase update practice - updated",
-                "content": "04_update_learning_note.py에서 수정한 내용입니다.",
+                "title": "업데이트",
+                "content": "업데이트내용",
             }
         )
-        .eq("id", note_id)
+        .eq("id", "20260721124806404")
         .execute()
     )
 
@@ -54,6 +54,7 @@ def main() -> None:
     print(f"id: {updated.get('id')}")
     print(f"title: {updated.get('title')}")
     print(f"content: {updated.get('content')}")
+    print(f"content: {updated.get('created_at')}")
 
 
 if __name__ == "__main__":

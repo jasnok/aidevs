@@ -18,7 +18,8 @@ def main() -> None:
     latest_result = (
         supabase.table("learning_notes")
         .select("*")
-        .eq("id", "4a255696-36a6-4f44-a2ec-1d00fa7c982f")
+        # .select("id,title")
+        .eq("id", "20260721124806404")
         .execute()
     )
     # latest_result = (
@@ -33,7 +34,9 @@ def main() -> None:
         print("조회할 메모가 없습니다. 먼저 01_create_learning_note.py를 실행해 보세요.")
         return
 
+    note = latest_result.data[0]
     note_id = latest_result.data[0]["id"]
+    print(f"{note["id"]} {note["title"]} {note["content"]} {note["created_at"]}")
 
     # eq("id", note_id)는 id가 같은 행 1개만 조회하겠다는 조건입니다.
     result = supabase.table("learning_notes").select("*").eq("id", note_id).execute()
