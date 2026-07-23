@@ -1,8 +1,5 @@
 """Notes API에서 사용하는 Pydantic 모델입니다."""
 
-from datetime import datetime
-from uuid import UUID
-
 from pydantic import BaseModel, Field
 
 
@@ -26,7 +23,7 @@ class NotePublic(BaseModel):
     """클라이언트에 반환하는 노트 응답 모델입니다."""
 
     # DB 내부 row를 그대로 반환하지 않고, 화면/API에 공개할 필드만 모델로 정의합니다.
-    id: UUID
+    id: str
     title: str
     content: str
-    created_at: datetime | None = None
+    created_at: str | None = None

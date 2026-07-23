@@ -15,5 +15,5 @@ create table if not exists ex90_notes (
   content text not null,
 
   -- created_at은 row가 만들어진 시간을 자동 기록합니다.
-  created_at timestamp not null default now()
+  created_at timestamptz not null default now()
 );

@@ -134,7 +134,7 @@ def mock_answer(
         같은 question이면 Redis에 저장된 답변을 바로 사용합니다.
     """
 
-    ttl_seconds = 60
+    ttl_seconds = 600
     cache_key = f"aidev:06:mock-answer:{question}"
 
     cached_result = redis_command("get", cache_key)

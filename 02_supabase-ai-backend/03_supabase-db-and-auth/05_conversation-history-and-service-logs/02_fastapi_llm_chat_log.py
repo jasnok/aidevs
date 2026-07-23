@@ -165,10 +165,10 @@ def create_gemini_answer(message: str) -> tuple[str, str]:
     response = client.models.generate_content(
         model=model,
         contents=prompt,
-        config={
-            "temperature": 0.3,
-            "max_output_tokens": 300,
-        },
+        # config={
+        #     "temperature": 0.3,
+        #     "max_output_tokens": 300,
+        # },
     )
 
     return response.text or "", model
