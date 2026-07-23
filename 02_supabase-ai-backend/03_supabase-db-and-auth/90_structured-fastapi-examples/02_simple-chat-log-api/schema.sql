@@ -25,5 +25,5 @@ create table if not exists ex90_simple_chat_logs (
   error_message text,
 
   -- 로그가 만들어진 시간입니다.
-  created_at timestamptz not null default now()
+  created_at timestamp not null default now()
 );

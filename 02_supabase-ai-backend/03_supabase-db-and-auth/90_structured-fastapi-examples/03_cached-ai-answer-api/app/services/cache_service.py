@@ -13,7 +13,7 @@ from app.core.gemini import get_gemini_client
 from app.schemas.cache_schema import CachedAnswerResponse
 
 
-TTL_SECONDS = 60
+TTL_SECONDS = 600
 
 
 def redis_command(*parts: str) -> dict:

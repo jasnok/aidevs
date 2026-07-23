@@ -8,5 +8,5 @@ create table if not exists ex90_multi_turn_chat_logs (
   created_at timestamptz not null default now()
 );
 
-create index if not exists ex90_multi_turn_chat_logs_conversation_created_idx
-on ex90_multi_turn_chat_logs (conversation_id, created_at);
+-- create index if not exists ex90_multi_turn_chat_logs_conversation_created_idx
+-- on ex90_multi_turn_chat_logs (conversation_id, created_at);
