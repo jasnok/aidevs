@@ -144,3 +144,9 @@ google-genai==1.2.0
 # - 99_final-frontend-project/backend_mock/tests
 # - 99_final-frontend-project/backend_service/tests
 pytest==8.4.2
+
+# session storage, local storage
+
+pyarrow
+streamlit-local-storage
+streamlit-browser-session-storage
