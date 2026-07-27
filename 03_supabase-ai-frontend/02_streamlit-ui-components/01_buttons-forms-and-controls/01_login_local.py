@@ -1,46 +1,47 @@
-# 01_login_local.py
+
 import streamlit as st
 from streamlit_local_storage import LocalStorage
 
-# 선언 --------------------------
-# loginout = st.query_params.get("loginout","logout")
 
-storage = LocalStorage()
-loginout = storage.getItem("loginout")
+storage = LocalStorage(key="login_storage")
+stored_loginout = storage.getItem("loginout") or "logout"
 
-if "input_login_id" not in st.session_state:
-    st.session_state.input_login_id = ""
+# 새 브라우저 세션에서는 localStorage의 상태를 가져옵니다.
+if "loginout" not in st.session_state:
+    st.session_state.loginout = stored_loginout
 
-if "input_login_pwd" not in st.session_state:
-    st.session_state.input_login_pwd = ""
 
-def reset():
-    st.session_state.input_login_id = ""
-    st.session_state.input_login_pwd = ""
+def login():
+    if (
+        st.session_state.login_id == "id01"
+        and st.session_state.login_pwd == "pwd01"
+    ):
+        st.session_state.loginout = "login"
 
-# 화면 --------------------------
-if loginout == "logout":
+
+def logout():
+    st.session_state.loginout = "logout"
+    st.session_state.login_id = ""
+    st.session_state.login_pwd = ""
+
+
+# 현재 로그인 상태와 브라우저 저장값이 다를 때만 기록합니다.
+if st.session_state.loginout != stored_loginout:
+    storage.setItem(
+        "loginout",
+        st.session_state.loginout,
+        key=f"save{st.session_state.loginout}",
+    )
+
+
+if st.session_state.loginout == "logout":
     st.title("LOGIN")
+
     with st.form("login_form"):
-        input_id = st.text_input("ID입력", key="input_login_id")
-        input_pwd = st.text_input("PWD입력",type="password", key="input_login_pwd")
+        st.text_input("ID 입력", key="login_id")
+        st.text_input("PWD 입력", type="password", key="login_pwd")
+        st.form_submit_button("LOGIN", on_click=login)
 
-        submit_area , reset_area = st.columns(2)
-        with submit_area:
-            login_submit = st.form_submit_button("LOGIN")
-        with reset_area:
-            reset_submit = st.form_submit_button("RESET", on_click=reset)
-
-        if login_submit:
-            if input_id == "id01" and input_pwd == "pwd01":
-               storage.setItem("loginout","login")
-            #    st.rerun()
-            else:
-                st.toast("로그인 실패")
 else:
-    st.info("로그인 했습니다.")
-    logout = st.button("LOGOUT")
-    if logout:
-        storage.setItem("loginout","logout")
-    
-# 코드 --------------------------
+    st.success("로그인되었습니다.")
+    st.button("LOGOUT", on_click=logout)

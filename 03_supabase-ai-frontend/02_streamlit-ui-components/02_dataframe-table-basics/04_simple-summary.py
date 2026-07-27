@@ -16,7 +16,12 @@ max_score = df["score"].max()  # 계산 결과나 입력값을 이후 코드에�
 total_time = df["study_time"].sum()  # 계산 결과나 입력값을 이후 코드에서 다시 쓰기 위해 변수에 저장합니다.
 
 st.dataframe(df)  # 표 형태의 데이터를 스크롤 가능한 DataFrame UI로 표시합니다.
-st.metric("평균 점수", f"{average_score:.1f}")  # 핵심 숫자나 상태값을 대시보드 지표 형태로 표시합니다.
-st.metric("최고 점수", int(max_score))  # 핵심 숫자나 상태값을 대시보드 지표 형태로 표시합니다.
-st.metric("총 학습 시간", f"{total_time:.1f}시간")  # 핵심 숫자나 상태값을 대시보드 지표 형태로 표시합니다.
+avg_area, max_area, total_area = st.columns(3)
+
+with avg_area:
+    st.metric("평균 점수", f"{average_score:.1f}")  # 핵심 숫자나 상태값을 대시보드 지표 형태로 표시합니다.
+with max_area:
+    st.metric("최고 점수", int(max_score))  # 핵심 숫자나 상태값을 대시보드 지표 형태로 표시합니다.with total_area:
+with total_area:
+    st.metric("총 학습 시간", f"{total_time:.1f}시간")  # 핵심 숫자나 상태값을 대시보드 지표 형태로 표시합니다.
 
