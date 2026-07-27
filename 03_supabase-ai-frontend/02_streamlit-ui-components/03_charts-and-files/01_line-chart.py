@@ -10,6 +10,6 @@ df = pd.DataFrame(  # 딕셔너리 데이터를 행과 열을 가진 DataFrame �
     }
 ).set_index("week")  # 이 줄은 예제의 핵심 동작을 단계별로 보여주기 위한 코드입니다.
 
-st.dataframe(df)  # 표 형태의 데이터를 스크롤 가능한 DataFrame UI로 표시합니다.
+# st.dataframe(df)  # 표 형태의 데이터를 스크롤 가능한 DataFrame UI로 표시합니다.
 st.line_chart(df)  # 이 줄은 예제의 핵심 동작을 단계별로 보여주기 위한 코드입니다.
 

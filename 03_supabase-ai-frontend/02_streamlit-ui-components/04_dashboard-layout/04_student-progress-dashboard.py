@@ -2,7 +2,6 @@ import pandas as pd  # 목록 데이터를 표와 차트로 다루기 위해 pan
 import streamlit as st  # Python 코드로 웹 화면을 만들기 위해 Streamlit을 st라는 별칭으로 가져옵니다.
 
 st.set_page_config(page_title="학습 진도 대시보드", layout="wide")  # 대시보드가 넓게 보이도록 페이지 레이아웃을 wide로 설정합니다.
-st.title("학습 진도 대시보드")  # Streamlit 화면의 가장 큰 제목을 표시합니다.
 
 df = pd.DataFrame(  # 학습자 목록을 DataFrame으로 만들어 표, 지표, 차트에 함께 사용합니다.
     [
@@ -16,6 +15,8 @@ df = pd.DataFrame(  # 학습자 목록을 DataFrame으로 만들어 표, 지표,
 with st.sidebar:  # 화면 왼쪽 사이드바에는 필터 조건을 배치합니다.
     selected_course = st.selectbox("과정", ["전체"] + sorted(df["course"].unique()))  # 전체 또는 특정 과정을 선택합니다.
     min_progress = st.slider("최소 진도율", 0, 100, 0)  # 표시할 데이터의 최소 진도율을 선택합니다.
+
+st.title("학습 진도 대시보드")  # Streamlit 화면의 가장 큰 제목을 표시합니다.
 
 filtered_df = df[df["progress"] >= min_progress]  # 먼저 최소 진도율 조건에 맞는 행만 남깁니다.
 if selected_course != "전체":  # 특정 과정이 선택된 경우에는 과정 조건을 추가로 적용합니다.
