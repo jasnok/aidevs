@@ -34,16 +34,16 @@ app = FastAPI(title="Frontend Practice Backend")  # Streamlit 연동 실습용 �
 # FastAPI 백엔드는 http://127.0.0.1:8000 또는 http://localhost:8000 에서 실행됩니다.
 # 포트 번호가 8501과 8000으로 다르기 때문에 브라우저는 두 주소를 다른 출처로 판단합니다.
 # 아래 설정은 수업용 Streamlit 주소에서 이 FastAPI 서버를 호출할 수 있도록 허용합니다.
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "http://localhost:8501",
-        "http://127.0.0.1:8501",
-    ],  # Streamlit 기본 실행 주소만 허용합니다.
-    allow_credentials=True,  # 쿠키나 인증 정보를 함께 보내는 요청도 허용할 수 있게 합니다.
-    allow_methods=["*"],  # GET, POST 등 모든 HTTP Method를 허용합니다.
-    allow_headers=["*"],  # Content-Type 같은 요청 헤더를 허용합니다.
-)
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origins=[
+#         "http://localhost:8501",
+#         "http://127.0.0.1:8501",
+#     ],  # Streamlit 기본 실행 주소만 허용합니다.
+#     allow_credentials=True,  # 쿠키나 인증 정보를 함께 보내는 요청도 허용할 수 있게 합니다.
+#     allow_methods=["*"],  # GET, POST 등 모든 HTTP Method를 허용합니다.
+#     allow_headers=["*"],  # Content-Type 같은 요청 헤더를 허용합니다.
+# )
 
 
 class MessageRequest(BaseModel):  # /api/message 요청 본문 구조를 정의합니다.

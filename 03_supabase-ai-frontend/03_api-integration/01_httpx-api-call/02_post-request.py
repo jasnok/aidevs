@@ -7,3 +7,8 @@ response = httpx.post(API_URL, json=payload, timeout=5.0)  # POST 요청을 보�
 
 print("status code:", response.status_code)  # HTTP 요청이 성공했는지 확인할 수 있는 상태 코드를 출력합니다.
 print("json:", response.json())  # 백엔드가 반환한 JSON 응답을 딕셔너리 형태로 출력합니다.
+
+result = response.json()
+
+print(result["name"])
+print(result["message"])

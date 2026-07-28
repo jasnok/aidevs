@@ -6,3 +6,11 @@ response = httpx.get(API_URL, timeout=5.0)  # GET 요청을 보내고 응답 객
 
 print("status code:", response.status_code)  # HTTP 요청이 성공했는지 확인할 수 있는 상태 코드를 출력합니다.
 print("json:", response.json())  # 백엔드가 반환한 JSON 응답을 딕셔너리 형태로 출력합니다.
+
+# list 또는 Dict
+result = response.json()
+print(type(response))
+print(type(result))
+
+print(result["status"])
+print(result["service"])

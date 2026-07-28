@@ -11,7 +11,7 @@ message = st.text_input("메시지")  # 백엔드에 보낼 메시지를 문자�
 if st.button("전송"):  # 버튼을 누른 순간에만 POST 요청을 보냅니다.
     payload = {"name": name, "message": message}  # 백엔드 Pydantic 모델이 기대하는 JSON 구조로 데이터를 만듭니다.
     response = httpx.post(f"{API_BASE_URL}/api/message", json=payload, timeout=5.0)  # 메시지 API에 POST 요청을 보냅니다.
-
+    st.info(f"응답코드 : {response.status_code}")
     if response.status_code == 200:  # HTTP 상태 코드가 200이면 정상 응답으로 처리합니다.
         result = response.json()  # JSON 응답을 딕셔너리로 변환합니다.
         st.success(result["reply"])  # 백엔드가 만든 reply 값을 성공 메시지로 표시합니다.
