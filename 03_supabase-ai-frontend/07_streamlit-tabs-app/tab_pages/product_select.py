@@ -3,7 +3,7 @@ import httpx
 import streamlit as st
 import pandas as pd
 
-API_BASE_URL = "https://zero2-mini-project-2.onrender.com"  # 프론트엔드가 호출할 백엔드 서버의 기본 주소를 한 곳에서 관리합니다.
+API_BASE_URL = "https://zero2-mini-project-8r38.onrender.com"  # 프론트엔드가 호출할 백엔드 서버의 기본 주소를 한 곳에서 관리합니다.
 
 @st.dialog("삭제")
 def show_del(p:dict) -> None:
