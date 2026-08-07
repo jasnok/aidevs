@@ -3,7 +3,6 @@ import streamlit as st  # Python 코드로 웹 화면을 만들기 위해 Stream
 
 API_BASE_URL = "http://127.0.0.1:8000"  # 프론트엔드가 호출할 백엔드 서버의 기본 주소를 한 곳에서 관리합니다.
 
-
 def call_chat_api(message):
     """05_ai-chatbot-interface 샘플 백엔드의 mock chat API를 호출합니다."""
     payload = {"question": message}  # 샘플 백엔드는 question 필드로 사용자 질문을 받습니다.
