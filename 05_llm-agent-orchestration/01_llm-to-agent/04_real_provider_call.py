@@ -20,7 +20,7 @@ BASE_URL = os.getenv("PYTHON_AGENT_API_URL", "http://127.0.0.1:8000")
 for provider in ("gemini", "openai", "ollama"):
     try:
         response = httpx.post(
-            f"{BASE_URL}/api/providers/generate",
+            f"{BASE_URL}/api/generate",
             json={
                 "provider": provider,
                 "message": "부산 2박 여행을 준비할 때 먼저 확인할 것은 무엇인가요?",
@@ -28,7 +28,7 @@ for provider in ("gemini", "openai", "ollama"):
             timeout=60,
         )
         response.raise_for_status()
-        data = response.json()["data"]
+        data = response.json()
         print(provider, data["model"], data["latency_ms"], data["content"])
     except httpx.HTTPError as error:
         print(provider, "호출 실패:", error)

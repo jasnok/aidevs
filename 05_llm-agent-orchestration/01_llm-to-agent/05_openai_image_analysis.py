@@ -16,9 +16,11 @@ class TravelImageAnalysis(BaseModel):
     visible_text: list[str] = Field(default_factory=list)
     travel_tips: list[str] = Field(default_factory=list)
     safety_notes: list[str] = Field(default_factory=list)
+    location_info: str | None = None
 
 
 load_dotenv()
+# py 05
 image_path = Path(sys.argv[1])
 content_type = mimetypes.guess_type(image_path.name)[0] or "image/jpeg"
 encoded = base64.b64encode(image_path.read_bytes()).decode("ascii")
