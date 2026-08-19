@@ -6,6 +6,7 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 
 class ReservationRequest(BaseModel):
+    # 계약에 없는 값이 조용히 버려지지 않도록 추가 필드를 거부합니다.
     model_config = ConfigDict(extra="forbid")
 
     customer_name: str = Field(min_length=1)
@@ -19,6 +20,7 @@ def validate_sample(name: str, payload: dict) -> None:
         request = ReservationRequest.model_validate(payload)
         print("검증 성공:", request.model_dump(mode="json"))
     except ValidationError as error:
+        # errors()는 화면이나 API 오류 형식으로 변환하기 쉬운 구조화 목록입니다.
         print("검증 실패:")
         for item in error.errors():
             location = ".".join(map(str, item["loc"]))
