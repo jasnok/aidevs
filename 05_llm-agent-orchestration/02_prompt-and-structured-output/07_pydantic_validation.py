@@ -34,6 +34,7 @@ if __name__ == "__main__":
             "customer_name": "김여행",
             "reservation_date": "2026-08-10",
             "people": 2,
+            # "children": 1,  # 계약에 없는 필드이므로 무시됩니다.
         },
     )
     validate_sample(

@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 load_dotenv()
 # 모든 실험이 같은 Backend와 Provider를 사용해야 Prompt만 공정하게 비교할 수 있습니다.
 BASE_URL = os.getenv("BACKEND_API_URL", "http://127.0.0.1:8000")
-PROVIDER = os.getenv("PROMPT_EXAMPLE_PROVIDER", "mock")
+PROVIDER = os.getenv("PROMPT_EXAMPLE_PROVIDER", "openai")
 
 
 def generate_text(system_prompt: str, message: str) -> dict[str, Any]:
