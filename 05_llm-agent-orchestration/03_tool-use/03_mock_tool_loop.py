@@ -1,5 +1,14 @@
 """System·User Message부터 Tool Result 기반 최종 답변까지 Mock Loop로 실행합니다."""
 
+# 1. 사용자 Message 입력
+# 2. System Prompt + User Message + Tool Schema를 LLM에 전달
+# 3. LLM이 Tool 사용 여부 판단
+# 4. 필요한 경우 LLM이 Tool Call 생성
+# 5. Backend가 인자를 검증하고 Tool 실행
+# 6. Tool Result를 기존 대화에 추가
+# 7. 전체 대화를 LLM에 다시 전달
+# 8. LLM이 Tool Result를 근거로 최종 답변 생성
+
 from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
