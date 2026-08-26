@@ -13,3 +13,4 @@ redis
 streamlit
 uvicorn
 pytest
+mcp>=1.27,<2

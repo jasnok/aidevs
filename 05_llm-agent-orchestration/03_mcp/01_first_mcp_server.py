@@ -10,6 +10,16 @@ mcp = FastMCP(
     instructions="현재 날씨와 호텔 정보를 제공하는 교육용 MCP Server입니다.",
 )
 
+@mcp.tool()
+def get_hotels(city: Literal["부산", "서울"], view:str) -> dict:
+    """도시와 뷰를 이용해서 호텔을 검색합니다."""
+    normalized = city.strip()
+    # RAG
+    return [
+        {"name" : "바다 호텔", "city": "부산", "view": view, "price": 120_000},
+        {"name" : "도시 호텔", "city": "부산", "view": view, "price": 140_000},
+       
+]
 
 @mcp.tool()
 def get_current_weather(city: Literal["부산", "서울"]) -> dict:
@@ -53,4 +63,5 @@ def baggage_policy() -> str:
 
 
 if __name__ == "__main__":
+    print("MCP Server를 stdio로 실행합니다. Ctrl+C로 종료할 수 있습니다.")
     mcp.run(transport="stdio")

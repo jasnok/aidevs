@@ -1,19 +1,21 @@
-"""GPT가 MCP Tool을 선택하고 결과로 답변하는 2단계 Tool Calling 예제입니다.
+# ai_agent.py
+
+"""GPT가 MCP Tool을 선택해 안전한 귀가 방법을 안내하는 예제입니다.
 
 실행 전 준비
     1. 과정 루트의 ``.env``에 ``OPENAI_API_KEY``와 ``OPENAI_MODEL``을 설정합니다.
     2. 가상환경에서 ``pip install -r requirements.txt``를 실행합니다.
-    3. 이 파일만 실행합니다. ``01_first_mcp_server.py``는 직접 실행하지 않습니다.
+    3. 이 파일만 실행합니다. ``mcp_server.py``는 직접 실행하지 않습니다.
 
 실행 명령
-    cd C:\\aidevs\\05_llm-agent-orchestration
-    python .\\03_mcp\\05_mcp_tool_loop.py
+    cd C:\\aidevs\\05_llm-agent-orchestration\\03_mcp\\0826_lab
+    python .\\ai_agent.py
 
 전체 흐름
     사용자 질문
-    → stdio MCP Client가 ``01_first_mcp_server.py``를 자식 프로세스로 자동 실행
+    → stdio MCP Client가 ``mcp_server.py``를 자식 프로세스로 자동 실행
     → MCP ``initialize``로 Client와 Server 기능 협상
-    → MCP ``tools/list``로 날씨·호텔 Tool과 arguments Schema 발견
+    → MCP ``tools/list``로 귀가 교통·안전 Tool과 arguments Schema 발견
     → MCP Schema를 OpenAI Responses API의 Function Tool Schema로 변환
     → GPT가 질문과 Schema를 보고 필요한 Tool 이름과 arguments 제안
     → Client가 제안된 이름을 MCP Tool allowlist와 비교
@@ -36,7 +38,7 @@
     - 모든 Tool Call, arguments, 결과, 오류 여부를 ``trace``에 기록합니다.
 
 이 예제에서 Loop를 사용하지 않는 이유
-    날씨 조회와 호텔 검색은 서로의 결과에 의존하지 않습니다. GPT가 첫 응답에서
+    교통 정보와 안전 안내는 서로의 결과에 의존하지 않습니다. GPT가 첫 응답에서
     필요한 Tool을 모두 선택할 수 있으므로, 모든 Tool을 실행한 뒤 두 번째 GPT
     호출에서 최종 답변만 만들면 충분합니다. 이전 Tool 결과를 보고 새 Tool을
     선택해야 하는 작업에서만 반복 Agent Loop가 필요합니다.
@@ -51,16 +53,20 @@ from typing import Any
 from dotenv import load_dotenv
 from openai import AsyncOpenAI
 
-from _stdio_client import connect_to_travel_server
+from _stdio_client import connect_to_return_home_server
 
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 load_dotenv(ROOT / ".env")
 OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1-mini")
 INSTRUCTIONS = (
-    "당신은 한국 여행 도우미입니다. 사용자 요청에 필요한 Tool을 모두 호출하기 "
-    "전에는 최종 답변을 작성하지 마세요. 날씨와 호텔을 함께 요청하면 두 Tool을 "
-    "모두 호출하세요. Tool 결과만 근거로 한국어 최종 답변을 작성하세요."
+    "당신은 술집 이용 후 안전한 귀가를 돕는 Agent입니다. "
+    "목적지가 있는 귀가 질문에는 get_return_transport_options를, "
+    "음주 또는 운전 관련 질문에는 get_safe_driving_guidance를 호출하세요. "
+    "두 조건에 모두 해당하면 두 Tool을 모두 호출하세요. "
+    "목적지가 없으면 추측하지 말고 사용자에게 물어보세요. "
+    "Tool 결과만 근거로 안전 안내와 추천 방법을 한국어로 간단히 답하고, "
+    "Mock 교통 정보는 실제 출발 전에 확인해야 한다고 알리세요."
 )
 
 
@@ -88,7 +94,7 @@ async def answer(question: str) -> dict[str, Any]:
 
     trace: list[dict[str, Any]] = []
 
-    async with AsyncOpenAI() as client, connect_to_travel_server() as session:
+    async with AsyncOpenAI() as client, connect_to_return_home_server() as session:
         discovered = (await session.list_tools()).tools
         available = {tool.name for tool in discovered}
         openai_tools = [to_openai_tool(tool) for tool in discovered]
@@ -150,10 +156,10 @@ async def answer(question: str) -> dict[str, Any]:
 
 
 async def main() -> None:
-    # result = await answer("부산 날씨 알려주세요.")
-    # result = await answer("부산 날씨와 15만원 이하 호텔을 찾아 주세요.")
-    # result = await answer("부산에서 15만원 이하 호텔을 찾아 주세요.")
-    result = await answer("부산 강변이 보이는 호텔을 찾아줘.")
+    # result = await answer("서울대입구역까지 어떻게 가?")
+    # result = await answer("밤 11시 50분에 강남역까지 가려면 택시가 나을까?")
+    # result = await answer("술을 마셨는데 운전해서 집에 가도 될까?")
+    result = await answer("술을 마셨는데 지금 서울대입구역까지 어떻게 가는 게 좋아?")
     print(json.dumps(result, ensure_ascii=False, indent=2))
 
 
