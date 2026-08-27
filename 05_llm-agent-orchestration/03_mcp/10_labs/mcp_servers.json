@@ -1,0 +1,8 @@
+{
+  "weather": {
+    "args": ["03_weather_mcp_server.py"]
+  },
+  "hotel": {
+    "args": ["03_hotel_mcp_server.py"]
+  }
+}

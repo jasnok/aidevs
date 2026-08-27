@@ -15,7 +15,7 @@
     사용자 질문
     → stdio MCP Client가 ``mcp_server.py``를 자식 프로세스로 자동 실행
     → MCP ``initialize``로 Client와 Server 기능 협상
-    → MCP ``tools/list``로 귀가 교통·안전 Tool과 arguments Schema 발견
+    → MCP ``tools/list``로 귀가 교통 Tool과 arguments Schema 발견
     → MCP Schema를 OpenAI Responses API의 Function Tool Schema로 변환
     → GPT가 질문과 Schema를 보고 필요한 Tool 이름과 arguments 제안
     → Client가 제안된 이름을 MCP Tool allowlist와 비교
@@ -38,10 +38,8 @@
     - 모든 Tool Call, arguments, 결과, 오류 여부를 ``trace``에 기록합니다.
 
 이 예제에서 Loop를 사용하지 않는 이유
-    교통 정보와 안전 안내는 서로의 결과에 의존하지 않습니다. GPT가 첫 응답에서
-    필요한 Tool을 모두 선택할 수 있으므로, 모든 Tool을 실행한 뒤 두 번째 GPT
-    호출에서 최종 답변만 만들면 충분합니다. 이전 Tool 결과를 보고 새 Tool을
-    선택해야 하는 작업에서만 반복 Agent Loop가 필요합니다.
+    귀가에 필요한 네 가지 교통수단을 하나의 Tool이 함께 반환하므로, Tool 실행 뒤
+    두 번째 GPT 호출에서 결과를 비교해 최종 답변을 만들면 충분합니다.
 """
 
 import asyncio
@@ -61,11 +59,10 @@ load_dotenv(ROOT / ".env")
 OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1-mini")
 INSTRUCTIONS = (
     "당신은 술집 이용 후 안전한 귀가를 돕는 Agent입니다. "
-    "목적지가 있는 귀가 질문에는 get_return_transport_options를, "
-    "음주 또는 운전 관련 질문에는 get_safe_driving_guidance를 호출하세요. "
-    "두 조건에 모두 해당하면 두 Tool을 모두 호출하세요. "
-    "목적지가 없으면 추측하지 말고 사용자에게 물어보세요. "
-    "Tool 결과만 근거로 안전 안내와 추천 방법을 한국어로 간단히 답하고, "
+    "목적지가 있는 귀가 질문에는 get_return_transport_options를 호출하세요. "
+    "목적지가 없으면 추측하지 말고 물어보세요. Tool 결과의 지하철, 버스, 택시, "
+    "대리기사를 시간과 비용 기준으로 비교해 한국어로 간단히 추천하세요. "
+    "대리기사는 사용자의 차량이 있을 때만 추천하고, Tool에 없는 정보는 만들지 마세요. "
     "Mock 교통 정보는 실제 출발 전에 확인해야 한다고 알리세요."
 )
 
@@ -157,9 +154,8 @@ async def answer(question: str) -> dict[str, Any]:
 
 async def main() -> None:
     # result = await answer("서울대입구역까지 어떻게 가?")
-    # result = await answer("밤 11시 50분에 강남역까지 가려면 택시가 나을까?")
-    # result = await answer("술을 마셨는데 운전해서 집에 가도 될까?")
-    result = await answer("술을 마셨는데 지금 서울대입구역까지 어떻게 가는 게 좋아?")
+    # result = await answer("지금 홍대입구역까지 버스로 갈 수 있어?")
+    result = await answer("밤 11시 50분에 강남역까지 어떤 교통수단이 좋아?")
     print(json.dumps(result, ensure_ascii=False, indent=2))
 
 
