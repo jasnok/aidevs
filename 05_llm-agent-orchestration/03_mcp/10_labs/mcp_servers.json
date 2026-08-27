@@ -4,5 +4,11 @@
   },
   "hotel": {
     "args": ["03_hotel_mcp_server.py"]
+  },
+  "tour": {
+    "args": ["tour_mcp_server.py"]
+  },
+  "book": {
+    "args": ["book_mcp_server.py"]
   }
 }
