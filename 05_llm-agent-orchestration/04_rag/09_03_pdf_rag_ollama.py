@@ -9,7 +9,7 @@ from _pgvector_store import OLLAMA_BASE_URL, similarity_search
 
 COLLECTION = "rag_pdf_lesson"
 CHAT_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2")
-QUESTION = "당일 취소 규정은 어떻게 되나요?"
+QUESTION = "에이전트에 대한 기술적 분석"
 TOP_K = 3
 
 

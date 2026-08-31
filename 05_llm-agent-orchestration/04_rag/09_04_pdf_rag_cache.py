@@ -16,7 +16,7 @@ from _redis_cache import DEFAULT_TTL_SECONDS, JsonCache, cache_key
 COLLECTION = "rag_pdf_lesson"
 CHAT_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2")
 CACHE_NAMESPACE = "pdf-rag-answer:v1"
-QUESTION = "당일 취소 규정은 어떻게 되나요?"
+QUESTION = "ai agent의 국가별 진행 현황"
 TOP_K = 3
 
 

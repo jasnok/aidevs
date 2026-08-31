@@ -11,8 +11,8 @@ from _pgvector_store import delete_collection, upsert_text
 
 COLLECTION = "rag_pdf_lesson"
 PDF_PATH = Path(__file__).resolve().parent / "ai.pdf"
-CHUNK_SIZE = 500
-OVERLAP = 80
+CHUNK_SIZE = 100
+OVERLAP = 10
 
 
 def split_text(text: str) -> list[str]:
