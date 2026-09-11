@@ -1,0 +1,33 @@
+# 시나리오: 수신자 PC에는 PostgreSQL·Redis·Ollama가 이미 Docker Container로 실행 중이다.
+# 수업 운영자가 Registry에 올린 Backend·Frontend Image만 내려받아 실행한다.
+name: simple-multi-llm-release
+
+services:
+  backend:
+    # .env에서 Registry Image와 버전을 지정한다.
+    image: ${BACKEND_IMAGE:?BACKEND_IMAGE을 .env에 설정하세요}
+    env_file:
+      - ./backend/.env
+    ports:
+      - "8000:8000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/ready')"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+    restart: unless-stopped
+
+  frontend:
+    # .env에서 Registry Image와 버전을 지정한다.
+    image: ${FRONTEND_IMAGE:?FRONTEND_IMAGE을 .env에 설정하세요}
+    env_file:
+      - ./frontend/.env
+    ports:
+      - "8501:8501"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped

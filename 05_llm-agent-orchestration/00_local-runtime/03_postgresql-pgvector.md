@@ -11,7 +11,7 @@ docker run -d `
   -p 5433:5432 `
   -e POSTGRES_DB=agent_db `
   -e POSTGRES_USER=agent_user `
-  -e POSTGRES_PASSWORD=agent_password `
+  -e POSTGRES_PASSWORD=agent_pwd `
   -v aidevs-pgvector-data:/var/lib/postgresql/data `
   pgvector/pgvector:pg16
 ```
