@@ -49,6 +49,7 @@ def live() -> dict:
 
 @app.get("/health")
 def health(redis_store: RedisDep, database: DatabaseDep, llm: LLMDep) -> dict:
+    
     checks: dict[str, object] = {
         "backend": True,
         "redis": False,
