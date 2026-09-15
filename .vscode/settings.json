@@ -46,6 +46,11 @@
       "path": "08_multi-agent-service-mini-project",
       "envManager": "ms-python.python:venv",
       "packageManager": "ms-python.python:pip"
+    },
+    {
+      "path": "07_multi-agent-service-ops/00_runtime-and-deployment/01_simple-multi-llm-compose",
+      "envManager": "ms-python.python:venv",
+      "packageManager": "ms-python.python:pip"
     }
   ]
 }
