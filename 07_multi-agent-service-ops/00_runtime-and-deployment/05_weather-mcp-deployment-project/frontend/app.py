@@ -14,6 +14,9 @@ st.sidebar.title("학습 메뉴")
 page = st.sidebar.radio("이동", ["Weather Agent", "구조 이해", "Health Check"])
 st.title("Weather MCP Deployment Project")
 
+
+
+
 if page == "Weather Agent":
     city = st.text_input("도시", "서울")
     day_label = st.radio("날짜", ["내일", "오늘"], horizontal=True)
