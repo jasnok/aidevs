@@ -22,6 +22,7 @@ async def fake_weather_tool(city: str, day: str) -> dict:
     }
 
 
+
 def fake_generate_answer(provider: str, weather: dict) -> tuple[str, str]:
     return f"{weather['city']}은 가벼운 겉옷이 필요합니다.", "fake-model"
 

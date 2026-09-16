@@ -12,15 +12,34 @@ from starlette.responses import JSONResponse
 
 mcp = FastMCP("weather-tools", host="0.0.0.0", port=8010, stateless_http=True, json_response=True)
 
+# Open-Meteo's geocoding index does not consistently resolve Korean names.
+CITY_QUERY_ALIASES = {
+    "서울": "Seoul", "서울시": "Seoul", "서울특별시": "Seoul",
+    "부산": "Busan", "부산시": "Busan", "부산광역시": "Busan",
+    "대구": "Daegu", "인천": "Incheon", "광주": "Gwangju",
+    "대전": "Daejeon", "울산": "Ulsan", "세종": "Sejong",
+    "제주": "Jeju", "제주시": "Jeju",
+}
+
+
+def geocoding_queries(city: str) -> list[str]:
+    normalized = city.strip()
+    alias = CITY_QUERY_ALIASES.get(normalized)
+    return [normalized] if not alias or alias.casefold() == normalized.casefold() else [normalized, alias]
+
 @mcp.tool(annotations=ToolAnnotations(readOnlyHint=True, destructiveHint=False, idempotentHint=True, openWorldHint=True))
 def get_weather(city: str, day: str = "tomorrow") -> dict:
     """도시 이름과 today 또는 tomorrow를 받아 실제 일별 날씨를 반환합니다."""
     if day not in {"today", "tomorrow"}:
         raise ValueError("day는 today 또는 tomorrow여야 합니다.")
     with httpx.Client(timeout=15) as client:
-        geo = client.get("https://geocoding-api.open-meteo.com/v1/search", params={"name": city, "count": 1, "language": "ko", "format": "json"})
-        geo.raise_for_status()
-        places = geo.json().get("results", [])
+        places = []
+        for query in geocoding_queries(city):
+            geo = client.get("https://geocoding-api.open-meteo.com/v1/search", params={"name": query, "count": 1, "language": "ko", "format": "json"})
+            geo.raise_for_status()
+            places = geo.json().get("results", [])
+            if places:
+                break
         if not places:
             return {"success": False, "error": "CITY_NOT_FOUND", "city": city}
         place = places[0]
