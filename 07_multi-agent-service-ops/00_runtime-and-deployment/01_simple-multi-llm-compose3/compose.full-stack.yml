@@ -1,6 +1,7 @@
 name: simple-multi-llm-full-stack
 
 services:
+#6379
   redis:
     image: redis:7-alpine
     command: ["redis-server", "--appendonly", "yes"]
@@ -12,6 +13,7 @@ services:
       timeout: 3s
       retries: 10
 
+#5432
   database:
     image: postgres:17-alpine
     environment:
@@ -27,11 +29,11 @@ services:
       timeout: 3s
       retries: 10
 
-  ollama:
-    profiles: ["ollama"]
-    image: ollama/ollama:latest
-    volumes:
-      - ollama_data:/root/.ollama
+  # ollama:
+  #   profiles: ["ollama"]
+  #   image: ollama/ollama:latest
+  #   volumes:
+  #     - ollama_data:/root/.ollama
 
   backend:
     build: ./backend
