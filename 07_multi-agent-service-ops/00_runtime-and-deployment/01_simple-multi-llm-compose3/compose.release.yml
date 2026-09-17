@@ -2,25 +2,58 @@
 # 수업 운영자가 Registry에 올린 Backend·Frontend Image만 내려받아 실행한다.
 name: release-simple-multi-llm
 
+# Application images are pulled from a registry. Redis and PostgreSQL run in
+# this Compose project, matching the full-stack service topology.
 services:
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  database:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-agent_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-agent_pwd}
+      POSTGRES_DB: ${POSTGRES_DB:-agent_db}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-agent_user} -d ${POSTGRES_DB:-agent_db}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
   backend:
     # .env에서 Registry Image와 버전을 지정한다.
-    image: ${BACKEND_IMAGE:?BACKEND_IMAGE을 .env에 설정하세요}
+    image: jso4603/fullstack-backend:1.0.0
     environment:
-      REDIS_URL: ${REDIS_URL:-redis://host.docker.internal:6379/0}
-      DATABASE_URL: ${DATABASE_URL:-postgresql://agent_user:agent_pwd@host.docker.internal:5433/agent_db}
+      REDIS_URL: redis://redis:6379/0
+      DATABASE_URL: postgresql://${POSTGRES_USER:-agent_user}:${POSTGRES_PASSWORD:-agent_pwd}@database:5432/${POSTGRES_DB:-agent_db}
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4.1-mini}
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
       GEMINI_MODEL: ${GEMINI_MODEL:-gemini-3.5-flash}
       OLLAMA_ENABLED: ${OLLAMA_ENABLED:-false}
-      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://ollama:11434}
       OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.2}
       GEMMA_MODEL: ${GEMMA_MODEL:-gemma3:4b}
     ports:
       - "8000:8000"
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    depends_on:
+      redis:
+        condition: service_healthy
+      database:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/ready')"]
       interval: 5s
@@ -31,7 +64,7 @@ services:
 
   frontend:
     # .env에서 Registry Image와 버전을 지정한다.
-    image: ${FRONTEND_IMAGE:?FRONTEND_IMAGE을 .env에 설정하세요}
+    image: jso4603/fullstack-frontend:1.0.0
     environment:
       BACKEND_URL: http://backend:8000
     ports:
@@ -40,3 +73,7 @@ services:
       backend:
         condition: service_healthy
     restart: unless-stopped
+
+volumes:
+  redis_data:
+  postgres_data:
