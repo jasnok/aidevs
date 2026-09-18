@@ -56,6 +56,21 @@
       "path": "07_multi-agent-service-ops/00_runtime-and-deployment/05_weather-mcp-deployment-project",
       "envManager": "ms-python.python:venv",
       "packageManager": "ms-python.python:pip"
+    },
+    {
+      "path": "07_multi-agent-service-ops/00_runtime-and-deployment/01_simple-multi-llm-compose22",
+      "envManager": "ms-python.python:venv",
+      "packageManager": "ms-python.python:pip"
+    },
+    {
+      "path": "07_multi-agent-service-ops/00_runtime-and-deployment/01_simple-multi-llm-compose22/backend",
+      "envManager": "ms-python.python:venv",
+      "packageManager": "ms-python.python:pip"
+    },
+    {
+      "path": "07_multi-agent-service-ops/00_runtime-and-deployment/01_simple-multi-llm-compose22/frontend",
+      "envManager": "ms-python.python:venv",
+      "packageManager": "ms-python.python:pip"
     }
   ]
 }
