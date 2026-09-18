@@ -4,8 +4,7 @@ name: simple-multi-llm-release
 
 services:
   backend:
-    # .env에서 Registry Image와 버전을 지정한다.
-    image: ${BACKEND_IMAGE:?BACKEND_IMAGE을 .env에 설정하세요}
+    image: jso4603/simple-backend:1.0.0
     environment:
       REDIS_URL: ${REDIS_URL:-redis://host.docker.internal:6379/0}
       DATABASE_URL: ${DATABASE_URL:-postgresql://agent_user:agent_pwd@host.docker.internal:5433/agent_db}
@@ -30,8 +29,7 @@ services:
     restart: unless-stopped
 
   frontend:
-    # .env에서 Registry Image와 버전을 지정한다.
-    image: ${FRONTEND_IMAGE:?FRONTEND_IMAGE을 .env에 설정하세요}
+    image: jso4603/simple-frontend:1.0.0
     environment:
       BACKEND_URL: http://backend:8000
     ports:

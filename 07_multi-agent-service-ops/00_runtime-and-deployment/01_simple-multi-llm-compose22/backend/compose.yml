@@ -1,0 +1,26 @@
+name: simple-multi-llm-backend
+
+# Local development: build and run only the backend service.
+# PostgreSQL, Redis, and optional Ollama must be reachable through backend/.env.
+services:
+  backend:
+    image: local/simple-multi-llm-backend:latest
+    build: .
+    env_file:
+      - .env
+    environment:
+      # These endpoints are supplied by backend/.env and point to separately
+      # deployed PostgreSQL and Redis services.
+      DATABASE_URL: ${DATABASE_URL:?Set DATABASE_URL in backend/.env}
+      REDIS_URL: ${REDIS_URL:?Set REDIS_URL in backend/.env}
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/ready')"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+    restart: unless-stopped

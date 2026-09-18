@@ -1,0 +1,17 @@
+name: simple-multi-llm-frontend
+
+# Local development: build and run only the frontend service.
+# Set BACKEND_URL in frontend/.env to the independently deployed backend URL.
+services:
+  frontend:
+    image: local/simple-multi-llm-frontend:latest
+    build: .
+    env_file:
+      - .env
+    environment:
+      # Use a reachable backend URL; this is not a Compose service name when
+      # frontend and backend are deployed independently.
+      BACKEND_URL: ${BACKEND_URL:?Set BACKEND_URL in frontend/.env}
+    ports:
+      - "${FRONTEND_PORT:-8501}:8501"
+    restart: unless-stopped

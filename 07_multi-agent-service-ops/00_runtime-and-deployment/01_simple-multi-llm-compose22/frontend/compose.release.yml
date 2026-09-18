@@ -1,0 +1,15 @@
+name: release-simple-multi-llm-frontend
+
+# Deployment: pull only the frontend image. Set FRONTEND_IMAGE in frontend/.env.
+services:
+  frontend:
+    image: ${FRONTEND_IMAGE:?Set FRONTEND_IMAGE in frontend/.env}
+    pull_policy: always
+    env_file:
+      - .env
+    environment:
+      # Use the backend's public URL or a private DNS name reachable from this host.
+      BACKEND_URL: ${BACKEND_URL:?Set BACKEND_URL in frontend/.env}
+    ports:
+      - "${FRONTEND_PORT:-8501}:8501"
+    restart: unless-stopped
