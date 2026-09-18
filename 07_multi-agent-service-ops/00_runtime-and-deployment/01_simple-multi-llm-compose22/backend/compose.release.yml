@@ -1,4 +1,4 @@
-name: release-simple-multi-llm-backend
+name: release-backend
 
 # Deployment: pull only the backend image. Set BACKEND_IMAGE in backend/.env.
 services:
@@ -6,7 +6,7 @@ services:
     image: ${BACKEND_IMAGE:?Set BACKEND_IMAGE in backend/.env}
     pull_policy: always
     env_file:
-      - .env
+      - .env.docker
     environment:
       # Keep stateful services outside this Compose project.
       DATABASE_URL: ${DATABASE_URL:?Set DATABASE_URL in backend/.env}

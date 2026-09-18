@@ -1,13 +1,13 @@
-name: simple-multi-llm-frontend
+name: aws-jso
 
 # Local development: build and run only the frontend service.
 # Set BACKEND_URL in frontend/.env to the independently deployed backend URL.
 services:
   frontend:
-    image: local/simple-multi-llm-frontend:latest
+    image: ${FRONTEND_IMAGE:?Set FRONTEND_IMAGE in frontend/.env}
     build: .
     env_file:
-      - .env
+      - .env.docker
     environment:
       # Use a reachable backend URL; this is not a Compose service name when
       # frontend and backend are deployed independently.

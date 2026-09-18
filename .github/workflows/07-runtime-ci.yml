@@ -4,10 +4,10 @@ name: 07 Runtime CI
 # CI를 언제 시작할지 정의합니다. 로컬의 git pull은 GitHub 이벤트가 아니므로 실행되지 않습니다.
 on:
   # 모든 브랜치의 Push 중, 아래 경로가 변경된 경우에만 실행합니다.
-  # push:
-  #   paths:
-  #     - "07_multi-agent-service-ops/00_runtime-and-deployment/**"
-  #     - ".github/workflows/07-runtime-ci.yml"
+  push:
+    paths:
+      - "07_multi-agent-service-ops/00_runtime-and-deployment/**"
+      - ".github/workflows/07-runtime-ci.yml"
   # Pull Request를 만들거나 갱신할 때도 같은 검사를 다시 실행합니다.
   pull_request:
     paths:

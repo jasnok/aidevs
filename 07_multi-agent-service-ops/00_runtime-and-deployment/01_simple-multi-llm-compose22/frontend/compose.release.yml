@@ -1,4 +1,4 @@
-name: release-simple-multi-llm-frontend
+name: release-frontend
 
 # Deployment: pull only the frontend image. Set FRONTEND_IMAGE in frontend/.env.
 services:
@@ -6,7 +6,7 @@ services:
     image: ${FRONTEND_IMAGE:?Set FRONTEND_IMAGE in frontend/.env}
     pull_policy: always
     env_file:
-      - .env
+      - .env.docker
     environment:
       # Use the backend's public URL or a private DNS name reachable from this host.
       BACKEND_URL: ${BACKEND_URL:?Set BACKEND_URL in frontend/.env}

@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+.pytest_cache/
+*.py[cod]
+
+.env
+.env.*
+
+compose*.yml
+compose*.yaml
+
+.git/
+.gitignore
+
+tests/
+test_*.py
+
