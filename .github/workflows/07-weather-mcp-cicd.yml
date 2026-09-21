@@ -2,6 +2,8 @@ name: 07 Weather MCP CI CD
 
 on:
   push:
+    branches:
+      - main
     paths:
       - "07_multi-agent-service-ops/00_runtime-and-deployment/05_weather-mcp-deployment-project/backend/**"
       - "07_multi-agent-service-ops/00_runtime-and-deployment/05_weather-mcp-deployment-project/frontend/**"
