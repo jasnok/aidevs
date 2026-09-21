@@ -19,6 +19,7 @@ st.title("Weather MCP Deployment Project")
 
 
 
+
 if page == "Weather Agent":
     city = st.text_input("도시", "서울")
     day_label = st.radio("날짜", ["내일", "오늘"], horizontal=True)
