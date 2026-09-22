@@ -1,0 +1,26 @@
+name: compose33-frontend
+
+# Deployment: pull only the frontend image. Set FRONTEND_IMAGE in frontend/.env.
+services:
+  frontend:
+    image: ${FRONTEND_IMAGE:?Set FRONTEND_IMAGE in frontend/.env}
+    container_name: compose33-frontend
+    pull_policy: always
+    env_file:
+      - ${FRONTEND_ENV_FILE:-.env.docker}
+    ports:
+      - "${FRONTEND_PORT:-8501}:8501"
+    networks:
+      - compose33-shared
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8501/_stcore/health')"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
+    restart: unless-stopped
+
+networks:
+  compose33-shared:
+    external: true
+    name: compose33-shared

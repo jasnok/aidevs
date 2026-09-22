@@ -1,0 +1,150 @@
+name: 07 Compose33 Frontend CI CD
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "07_multi-agent-service-ops/00_runtime-and-deployment/01_simple-multi-llm-compose33/frontend/**"
+      - ".github/workflows/07-compose33-frontend-cicd.yml"
+  pull_request:
+    paths:
+      - "07_multi-agent-service-ops/00_runtime-and-deployment/01_simple-multi-llm-compose33/frontend/**"
+      - ".github/workflows/07-compose33-frontend-cicd.yml"
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: "Deploy Compose33 frontend to wk01"
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: compose33-frontend-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  PROJECT_DIR: 07_multi-agent-service-ops/00_runtime-and-deployment/01_simple-multi-llm-compose33
+  FRONTEND_REPOSITORY: jso4603/simple-frontend
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Check frontend Python syntax
+        working-directory: ${{ env.PROJECT_DIR }}/frontend
+        run: python -m py_compile app.py
+
+      - name: Validate frontend release Compose
+        working-directory: ${{ env.PROJECT_DIR }}/frontend
+        run: FRONTEND_ENV_FILE=.env.docker.example docker compose --env-file .env.docker.example -f compose.release.yml config --quiet
+
+      - name: Build frontend image
+        working-directory: ${{ env.PROJECT_DIR }}/frontend
+        run: docker build --tag "$FRONTEND_REPOSITORY:${GITHUB_SHA}" .
+
+  publish-image:
+    if: >-
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'workflow_dispatch' && inputs.deploy)
+    needs: test-and-build
+    runs-on: ubuntu-latest
+    environment: wk01
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v5
+
+      - name: Validate Docker Hub secrets
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: |
+          test -n "$DOCKERHUB_USERNAME" || { echo "::error::DOCKERHUB_USERNAME is missing"; exit 1; }
+          test -n "$DOCKERHUB_TOKEN" || { echo "::error::DOCKERHUB_TOKEN is missing"; exit 1; }
+
+      - name: Build and push frontend image
+        working-directory: ${{ env.PROJECT_DIR }}/frontend
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: |
+          printf '%s' "$DOCKERHUB_TOKEN" | docker login --username "$DOCKERHUB_USERNAME" --password-stdin
+          docker build --tag "$FRONTEND_REPOSITORY:${GITHUB_SHA}" --tag "$FRONTEND_REPOSITORY:compose33-latest" .
+          docker push "$FRONTEND_REPOSITORY:${GITHUB_SHA}"
+          docker push "$FRONTEND_REPOSITORY:compose33-latest"
+
+  deploy-frontend:
+    needs: publish-image
+    runs-on: ubuntu-latest
+    environment: wk01
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v5
+
+      - name: Validate deployment secrets
+        env:
+          AWS_HOST: ${{ secrets.AWS_HOST }}
+          AWS_USER: ${{ secrets.AWS_USER }}
+          SSH_PRIVATE_KEY: ${{ secrets.AWS_SSH_PRIVATE_KEY }}
+          AWS_SSH_KNOWN_HOSTS: ${{ secrets.AWS_SSH_KNOWN_HOSTS }}
+        run: |
+          test -n "$AWS_HOST" || { echo "::error::AWS_HOST is missing"; exit 1; }
+          test -n "$AWS_USER" || { echo "::error::AWS_USER is missing"; exit 1; }
+          test -n "$SSH_PRIVATE_KEY" || { echo "::error::AWS_SSH_PRIVATE_KEY is missing"; exit 1; }
+          test -n "$AWS_SSH_KNOWN_HOSTS" || { echo "::error::AWS_SSH_KNOWN_HOSTS is missing"; exit 1; }
+
+      - name: Configure verified SSH identity
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.AWS_SSH_PRIVATE_KEY }}
+          AWS_SSH_KNOWN_HOSTS: ${{ secrets.AWS_SSH_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' "$AWS_SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Copy frontend deployment file
+        env:
+          AWS_HOST: ${{ secrets.AWS_HOST }}
+          AWS_USER: ${{ secrets.AWS_USER }}
+        run: |
+          ssh -o StrictHostKeyChecking=yes "$AWS_USER@$AWS_HOST" 'mkdir -p ~/compose33/frontend'
+          scp -o StrictHostKeyChecking=yes "$PROJECT_DIR/frontend/compose.release.yml" "$AWS_USER@$AWS_HOST:~/compose33/frontend/compose.release.yml"
+
+      - name: Deploy and verify frontend
+        env:
+          AWS_HOST: ${{ secrets.AWS_HOST }}
+          AWS_USER: ${{ secrets.AWS_USER }}
+          FRONTEND_IMAGE: jso4603/simple-frontend:${{ github.sha }}
+        run: |
+          ssh -o StrictHostKeyChecking=yes "$AWS_USER@$AWS_HOST" "
+            set -e
+            cd ~/compose33/frontend
+            test -f .env.docker
+            for attempt in \$(seq 1 36); do
+              if docker network inspect compose33-shared >/dev/null 2>&1; then break; fi
+              sleep 5
+            done
+            docker network inspect compose33-shared >/dev/null
+            FRONTEND_IMAGE='$FRONTEND_IMAGE' docker compose --env-file .env.docker -f compose.release.yml config --quiet
+            FRONTEND_IMAGE='$FRONTEND_IMAGE' docker compose --env-file .env.docker -f compose.release.yml pull
+            FRONTEND_IMAGE='$FRONTEND_IMAGE' docker compose --env-file .env.docker -f compose.release.yml up -d --force-recreate --remove-orphans --wait --wait-timeout 180
+            docker compose --env-file .env.docker -f compose.release.yml ps
+            curl --fail --show-error --retry 18 --retry-delay 5 --retry-connrefused --retry-all-errors http://127.0.0.1:8501/_stcore/health
+            for attempt in \$(seq 1 36); do
+              if docker exec compose33-frontend python -c \"import urllib.request; urllib.request.urlopen('http://backend:8000/health/ready')\"; then exit 0; fi
+              sleep 5
+            done
+            exit 1
+          "

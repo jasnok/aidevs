@@ -1,0 +1,51 @@
+name: compose33-infrastructure
+
+services:
+  database:
+    image: pgvector/pgvector:pg16
+    container_name: compose33-pgvector
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:?Set POSTGRES_USER in infrastructure.env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in infrastructure.env}
+      POSTGRES_DB: ${POSTGRES_DB:?Set POSTGRES_DB in infrastructure.env}
+    volumes:
+      - compose33_postgres_data:/var/lib/postgresql/data
+      - ./backend/database/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    networks:
+      compose33-shared:
+        aliases: [database]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: compose33-redis
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - compose33_redis_data:/data
+    networks:
+      compose33-shared:
+        aliases: [redis]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 5s
+    restart: unless-stopped
+
+networks:
+  compose33-shared:
+    name: compose33-shared
+
+volumes:
+  compose33_postgres_data:
+    name: compose33-postgres-data
+  compose33_redis_data:
+    name: compose33-redis-data
+

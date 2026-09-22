@@ -1,0 +1,27 @@
+name: compose33-backend
+
+# Deployment: pull only the backend image. Set BACKEND_IMAGE in backend/.env.
+services:
+  backend:
+    image: ${BACKEND_IMAGE:?Set BACKEND_IMAGE in backend/.env}
+    container_name: compose33-backend
+    pull_policy: always
+    env_file:
+      - ${BACKEND_ENV_FILE:-.env.docker}
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    networks:
+      compose33-shared:
+        aliases: [backend]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/ready')"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+    restart: unless-stopped
+
+networks:
+  compose33-shared:
+    external: true
+    name: compose33-shared

@@ -1,0 +1,161 @@
+name: 07 Compose33 Backend CI CD
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "07_multi-agent-service-ops/00_runtime-and-deployment/01_simple-multi-llm-compose33/backend/**"
+      - "07_multi-agent-service-ops/00_runtime-and-deployment/01_simple-multi-llm-compose33/compose.infrastructure.yml"
+      - "07_multi-agent-service-ops/00_runtime-and-deployment/01_simple-multi-llm-compose33/infrastructure.env.example"
+      - ".github/workflows/07-compose33-backend-cicd.yml"
+  pull_request:
+    paths:
+      - "07_multi-agent-service-ops/00_runtime-and-deployment/01_simple-multi-llm-compose33/backend/**"
+      - "07_multi-agent-service-ops/00_runtime-and-deployment/01_simple-multi-llm-compose33/compose.infrastructure.yml"
+      - "07_multi-agent-service-ops/00_runtime-and-deployment/01_simple-multi-llm-compose33/infrastructure.env.example"
+      - ".github/workflows/07-compose33-backend-cicd.yml"
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: "Deploy Compose33 backend and infrastructure to wk01"
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: compose33-backend-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  PROJECT_DIR: 07_multi-agent-service-ops/00_runtime-and-deployment/01_simple-multi-llm-compose33
+  BACKEND_REPOSITORY: jso4603/simple-backend
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install backend dependencies
+        working-directory: ${{ env.PROJECT_DIR }}/backend
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt pytest
+
+      - name: Run backend tests
+        working-directory: ${{ env.PROJECT_DIR }}/backend
+        env:
+          OPENAI_API_KEY: ""
+          GEMINI_API_KEY: ""
+        run: python -m pytest test_app.py -q
+
+      - name: Validate deployment Compose files
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          docker compose --env-file infrastructure.env.example -f compose.infrastructure.yml config --quiet
+          BACKEND_ENV_FILE=.env.docker.example docker compose --env-file backend/.env.docker.example -f backend/compose.release.yml config --quiet
+
+      - name: Build backend image
+        working-directory: ${{ env.PROJECT_DIR }}/backend
+        run: docker build --tag "$BACKEND_REPOSITORY:${GITHUB_SHA}" .
+
+  publish-image:
+    if: >-
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'workflow_dispatch' && inputs.deploy)
+    needs: test-and-build
+    runs-on: ubuntu-latest
+    environment: wk01
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v5
+
+      - name: Validate Docker Hub secrets
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: |
+          test -n "$DOCKERHUB_USERNAME" || { echo "::error::DOCKERHUB_USERNAME is missing"; exit 1; }
+          test -n "$DOCKERHUB_TOKEN" || { echo "::error::DOCKERHUB_TOKEN is missing"; exit 1; }
+
+      - name: Build and push backend image
+        working-directory: ${{ env.PROJECT_DIR }}/backend
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: |
+          printf '%s' "$DOCKERHUB_TOKEN" | docker login --username "$DOCKERHUB_USERNAME" --password-stdin
+          docker build --tag "$BACKEND_REPOSITORY:${GITHUB_SHA}" --tag "$BACKEND_REPOSITORY:compose33-latest" .
+          docker push "$BACKEND_REPOSITORY:${GITHUB_SHA}"
+          docker push "$BACKEND_REPOSITORY:compose33-latest"
+
+  deploy-backend:
+    needs: publish-image
+    runs-on: ubuntu-latest
+    environment: wk01
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v5
+
+      - name: Validate deployment secrets
+        env:
+          AWS_HOST: ${{ secrets.AWS_HOST }}
+          AWS_USER: ${{ secrets.AWS_USER }}
+          SSH_PRIVATE_KEY: ${{ secrets.AWS_SSH_PRIVATE_KEY }}
+          AWS_SSH_KNOWN_HOSTS: ${{ secrets.AWS_SSH_KNOWN_HOSTS }}
+        run: |
+          test -n "$AWS_HOST" || { echo "::error::AWS_HOST is missing"; exit 1; }
+          test -n "$AWS_USER" || { echo "::error::AWS_USER is missing"; exit 1; }
+          test -n "$SSH_PRIVATE_KEY" || { echo "::error::AWS_SSH_PRIVATE_KEY is missing"; exit 1; }
+          test -n "$AWS_SSH_KNOWN_HOSTS" || { echo "::error::AWS_SSH_KNOWN_HOSTS is missing"; exit 1; }
+
+      - name: Configure verified SSH identity
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.AWS_SSH_PRIVATE_KEY }}
+          AWS_SSH_KNOWN_HOSTS: ${{ secrets.AWS_SSH_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' "$AWS_SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Copy backend deployment files
+        env:
+          AWS_HOST: ${{ secrets.AWS_HOST }}
+          AWS_USER: ${{ secrets.AWS_USER }}
+        run: |
+          ssh -o StrictHostKeyChecking=yes "$AWS_USER@$AWS_HOST" 'mkdir -p ~/compose33/backend/database'
+          scp -o StrictHostKeyChecking=yes "$PROJECT_DIR/compose.infrastructure.yml" "$AWS_USER@$AWS_HOST:~/compose33/compose.infrastructure.yml"
+          scp -o StrictHostKeyChecking=yes "$PROJECT_DIR/backend/database/init.sql" "$AWS_USER@$AWS_HOST:~/compose33/backend/database/init.sql"
+          scp -o StrictHostKeyChecking=yes "$PROJECT_DIR/backend/compose.release.yml" "$AWS_USER@$AWS_HOST:~/compose33/backend/compose.release.yml"
+
+      - name: Start infrastructure and deploy backend
+        env:
+          AWS_HOST: ${{ secrets.AWS_HOST }}
+          AWS_USER: ${{ secrets.AWS_USER }}
+          BACKEND_IMAGE: jso4603/simple-backend:${{ github.sha }}
+        run: |
+          ssh -o StrictHostKeyChecking=yes "$AWS_USER@$AWS_HOST" "
+            set -e
+            cd ~/compose33
+            test -f infrastructure.env
+            test -f backend/.env.docker
+            docker compose --env-file infrastructure.env -f compose.infrastructure.yml config --quiet
+            docker compose --env-file infrastructure.env -f compose.infrastructure.yml up -d --wait --wait-timeout 180
+            cd backend
+            BACKEND_IMAGE='$BACKEND_IMAGE' docker compose --env-file .env.docker -f compose.release.yml config --quiet
+            BACKEND_IMAGE='$BACKEND_IMAGE' docker compose --env-file .env.docker -f compose.release.yml pull
+            BACKEND_IMAGE='$BACKEND_IMAGE' docker compose --env-file .env.docker -f compose.release.yml up -d --force-recreate --remove-orphans --wait --wait-timeout 180
+            docker compose --env-file .env.docker -f compose.release.yml ps
+            curl --fail --show-error --retry 18 --retry-delay 5 --retry-connrefused --retry-all-errors http://127.0.0.1:8000/health/ready
+          "

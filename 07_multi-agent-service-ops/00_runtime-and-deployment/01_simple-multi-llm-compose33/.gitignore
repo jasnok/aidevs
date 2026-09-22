@@ -1,0 +1,10 @@
+.env
+.env.docker
+.venv/
+__pycache__/
+.pytest_cache/
+*.py[cod]
+
+!.env.example
+!.env.docker.example
+
