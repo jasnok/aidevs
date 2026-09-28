@@ -107,6 +107,59 @@ Task에는 최소한 다음 내용이 필요합니다.
 - `expected_output`: 반환해야 하는 결과
 - `completion_condition`: 완료를 판단하는 조건
 
+### Role Card와 Task 명세는 무엇을 정하나요?
+
+Role은 요청이 달라져도 유지되는 Agent의 책임 범위입니다. Goal은 달성할 목표,
+Responsibility는 맡는 일, Non-goal은 하지 않을 일을 적습니다. 예산 Agent의 Role은
+여행 예산을 배분하고 합계를 확인하는 것이며, 예약·결제는 맡지 않습니다. 실제 요청의
+금액이나 여행지는 Role에 고정하지 않습니다.
+
+Task는 한 요청에서 그 Role을 가진 Agent가 완료해야 하는 일입니다. `02_task_decomposition.py`의
+`AgentTask`는 이를 설명하기 위한 Pydantic 모델입니다. 예를 들면 다음과 같습니다.
+
+```text
+task_id: allocate_budget
+agent_id: budget_agent
+required_input: destination, days, people, total_budget
+expected_output: BudgetResult의 breakdown, total
+completion_condition: 네 항목의 금액이 유효하고 합계가 total과 일치함
+실패 시 행동: 검증되지 않은 예산을 Itinerary Agent에 전달하지 않음
+```
+
+Task를 설계할 때는 최종 결과에서 거꾸로 필요한 중간 결과를 찾습니다. 부산 일정이 최종
+결과라면 날씨·장소·예산·안전 결과가 필요하고, 일정 Task는 이 결과들을 입력으로 받습니다.
+각 Task마다 담당 Agent, 필수 입력, 출력 계약, 완료 조건, 선행 Task와 실패 시 행동을
+정합니다. "적절한 예산"처럼 주관적인 완료 조건보다는 "필수 항목이 있고 합계가 일치함"처럼
+코드로 확인할 수 있는 조건이 유용합니다.
+
+Role Card나 `AgentTask` 객체를 만든 것만으로 Agent가 실행되지는 않습니다. 이는 설계
+명세이며, 필수 입력 확인·Tool 호출·출력 계약 검증·다음 Task 실행 조건을 실제 코드에
+연결해야 합니다. `04_role_specific_contracts.py`의 고정된 예산 결과는 이러한 출력
+모양을 보여 주는 예제이고, `07_real_multi_llm_contracts.py`는 실제 LLM 결과를 계약으로
+받습니다.
+
+### Task 설계를 실행 코드에 연결하기
+
+02 미니 프로젝트 `mini_multi_agent_02_role_task_contract`에서도
+`backend/app/schemas/contracts.py`에 `AgentRoleCard`와 `AgentTask`가 있습니다. 현재 두
+모델은 `backend/app/services/catalog.py`의 `ROLE_CARDS`와 `TASKS`를 만들고, API를 통해
+학습 화면에 보여 주는 데 사용합니다. `TASKS` 목록을 읽어서 작업을 자동 실행하거나
+`completion_condition` 문자열을 평가하지는 않습니다.
+
+실제 실행 규칙은 다음 코드에 나뉘어 있습니다.
+
+| 설계 내용 | 현재 실행 코드 |
+| --- | --- |
+| 지속적인 Agent 설정, Provider, 허용 Tool, 출력 계약 | `backend/app/agents/*_agent.py`의 `AgentProfile`과 `backend/app/agents/registry.py` |
+| 요청에서 Tool 인자를 추출하고 Tool·LLM을 호출하며 출력 계약을 검증 | `backend/app/agents/runtime.py`의 `run_agent()` |
+| Agent 실행 순서, 검증된 결과 전달, 실패 시 다음 Agent 건너뛰기 | `backend/app/orchestration/verified_flow.py` |
+
+`run_multi_llm()`은 Weather → Place → Budget → Safety Agent를 코드에 적힌 순서대로
+호출합니다. `run_verified_flow()`는 Budget Agent의 결과가 `BudgetResult` 검증을
+통과할 때만 Itinerary Agent를 호출합니다. 이 흐름에서 `AgentTask`는 실행 엔진의
+입력이 아니며, Task 명세의 조건 일부가 `run_agent()`와 출력 계약 및 Orchestration에
+별도로 구현돼 있습니다. 따라서 명세와 실행 코드가 일치하는지 함께 확인해야 합니다.
+
 ## 공통 계약과 역할별 계약
 
 모든 Agent가 공통으로 사용하는 Metadata는 협업 상태를 파악하는 데 도움이 됩니다.

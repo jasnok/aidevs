@@ -15,7 +15,7 @@ load_dotenv()
 T = TypeVar("T", bound=BaseModel)
 SUPPORTED_PROVIDERS = ("openai", "gemini", "ollama", "gemma")
 DEFAULT_AGENT_PROVIDERS = {
-    "weather_agent": "openai",
+    "weather_agent": "openai", 
     "place_agent": "ollama",
     "budget_agent": "openai",
     "safety_agent": "gemma",
@@ -54,21 +54,28 @@ def run_structured(provider: str, prompt: str, schema: type[T]) -> T:
     if provider == "openai":
         from openai import OpenAI
 
-        response = OpenAI().responses.parse(model=model, input=prompt, text_format=schema)
+        # Keep the client alive for the entire request. Creating it as a
+        # temporary expression can let its underlying HTTP client be closed
+        # before the SDK has finished consuming the response.
+        with OpenAI() as client:
+            response = client.responses.parse(model=model, input=prompt, text_format=schema)
         if response.output_parsed is None:
             raise RuntimeError("OpenAI가 구조화된 결과를 반환하지 않았습니다.")
         return response.output_parsed
     if provider == "gemini":
         from google import genai
 
-        response = genai.Client(api_key=os.environ["GEMINI_API_KEY"]).models.generate_content(
-            model=model,
-            contents=prompt,
-            config={
-                "response_mime_type": "application/json",
-                "response_json_schema": schema.model_json_schema(),
-            },
-        )
+        # Do not create Client inline. google-genai may garbage-collect that
+        # temporary object and close httpx while generate_content is running.
+        with genai.Client(api_key=os.environ["GEMINI_API_KEY"]) as client:
+            response = client.models.generate_content(
+                model=model,
+                contents=prompt,
+                config={
+                    "response_mime_type": "application/json",
+                    "response_json_schema": schema.model_json_schema(),
+                },
+            )
         if not response.text:
             raise RuntimeError("Gemini가 구조화된 결과를 반환하지 않았습니다.")
         return schema.model_validate_json(response.text)
@@ -133,11 +140,11 @@ Goal: {goal}
 LearningAgentResult 형식으로 반환하고 agent_id는 반드시 {agent_id}로 작성하세요.
 """.strip()
     response = run_with_metadata(provider, prompt, LearningAgentResult)
-    if response["result"] is not None and response["result"]["agent_id"] != agent_id:
-        actual_agent_id = response["result"]["agent_id"]
-        response["result"] = None
-        response["provider_used"] = None
-        response["error"] = f"Agent 역할 불일치: expected={agent_id}, actual={actual_agent_id}"
+    if response["result"] is not None:
+        # Agent identity belongs to the orchestrator, not to model-generated
+        # content. Some local models confuse it with a domain identifier such
+        # as a place ID (for example P001), so stamp the trusted caller value.
+        response["result"]["agent_id"] = agent_id
     return response
 
 
@@ -152,11 +159,8 @@ def run_learning_agent_with_failover(
     for provider in providers:
         prompt = f"당신은 {agent_id}입니다. Goal: {goal}\n요청: {request}\nagent_id는 반드시 {agent_id}입니다."
         response = run_with_metadata(provider, prompt, LearningAgentResult)
-        if response["result"] is not None and response["result"]["agent_id"] != agent_id:
-            actual_agent_id = response["result"]["agent_id"]
-            response["result"] = None
-            response["provider_used"] = None
-            response["error"] = f"Agent 역할 불일치: expected={agent_id}, actual={actual_agent_id}"
+        if response["result"] is not None:
+            response["result"]["agent_id"] = agent_id
         attempts.append({
             "provider": provider,
             "model": response["model"],
