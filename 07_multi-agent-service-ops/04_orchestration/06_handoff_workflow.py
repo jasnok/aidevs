@@ -68,11 +68,8 @@ if __name__ == "__main__":
     else:
         if decision["result"]["target_agent"] != "refund_agent":
             raise ValueError("Support Agent가 허용되지 않은 Handoff 대상을 선택했습니다.")
-        allowed_context_keys = {"order_id", "issue"}
-        proposed_context = decision["result"]["handoff_context"]
-        safe_context = {key: value for key, value in proposed_context.items() if key in allowed_context_keys}
-        safe_context.setdefault("order_id", "ORDER-102")
-        safe_context.setdefault("issue", "배송이 일주일 지연됨")
+        # 두 값은 계약에서 필수 검증되었습니다. 누락된 Context를 성공 데이터로 채우지 않습니다.
+        safe_context = decision["result"]["handoff_context"]
         handoff = SupportHandoff(
             task_id="support-001",
             trace_id="trace-001",

@@ -1,0 +1,35 @@
+workers:
+  move_scope_agent:
+    name: 이사 범위 정리 Agent
+    goal: 사용자 물품의 처분 방향과 서비스의 현재 상태를 빠짐없이 정리한다.
+    instructions: |
+      입력의 item_id와 service_id, 이름과 사용자 상태를 그대로 유지하세요.
+      가져갈 물품과 판매·처분할 물품을 구분하세요.
+      예약이나 신청이 끝났다는 근거가 없으면 완료로 바꾸지 마세요.
+      준비 작업이나 최종 일정은 작성하지 마세요.
+    provider: openai
+    output_contract: MoveScopeResult
+
+  move_action_agent:
+    name: 이사 준비 작업 Agent
+    goal: 검증된 각 물품과 서비스의 준비 작업 또는 작업이 없는 이유를 작성한다.
+    instructions: |
+      검증된 MoveScopeResult의 ID만 참조하세요.
+      용달 예약, 가스 전출, 에어컨 철거, 인터넷 이전·해지 작업은
+      해당 대상이 입력에 있을 때만 작성하세요.
+      task_id는 실행 안에서 중복 없이 붙이세요.
+      실제 예약·신청·철거를 했다고 선언하지 마세요.
+    provider: openai
+    output_contract: MoveActionPlanResult
+
+  move_timeline_agent:
+    name: 이사 일정 Agent
+    goal: 준비 작업을 이사 전·당일·후로 배치하고 빠진 대상을 표시한다.
+    instructions: |
+      검증된 앞의 두 계약에 나온 ID만 사용하세요.
+      모든 물품과 서비스 ID를 최종 결과에 포함하세요.
+      판매할 물품을 운반 대상으로 바꾸지 마세요.
+      완료 근거가 없는 작업을 완료라고 표시하지 마세요.
+      비용과 예약 시각을 추측하지 마세요.
+    provider: openai
+    output_contract: MoveTimelineResult

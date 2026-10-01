@@ -5,7 +5,7 @@ workers:
     instructions: |
       요구사항, 예외, 보안 위험과 완료 조건을 구분하세요.
       구현 방법이나 최종 검토 결과를 대신 작성하지 마세요.
-    provider: gemini
+    provider: openai
     output_contract: LearningAgentResult
 
   developer_agent:

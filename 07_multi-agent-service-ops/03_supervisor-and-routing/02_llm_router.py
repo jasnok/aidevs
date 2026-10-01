@@ -43,7 +43,7 @@ def selected_worker_agent(agent_id: str, message: str) -> dict:
 
 
 if __name__ == "__main__":
-    request = "ORDER-102 배송이 너무 늦어서 취소하고 싶습니다. 먼저 무엇을 확인해야 하나요?"
+    request = "주문을 취소하고 싶습니다."
     route = llm_router_agent(request)
     print("=== Router 결정 ===")
     print(json.dumps(route, ensure_ascii=False, indent=2))
